@@ -1,0 +1,20 @@
+//编写proto文件
+syntax = "proto3";
+
+package data;
+option go_package = "./gen";
+
+message Req{
+  int64 id = 1;
+}
+
+message Res{
+  string data = 1;
+}
+
+service DataService{
+  rpc GetDataInfo(Req) returns (Res){}
+}
+
+//终端执行命令
+//E:\codeWork\go\test\project-grpc\api\proto> protoc --go_out=./gen --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_out=paths=source_relative data.proto

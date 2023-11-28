@@ -6,6 +6,6 @@ use (
 	./auth-service
 	./log-service
 	./store-service
-	./store-service-grpc
+	./store-service-grpc/mysql-first
 	./task-service
 )
