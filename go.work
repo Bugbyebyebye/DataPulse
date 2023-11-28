@@ -1,0 +1,10 @@
+go 1.20
+
+use (
+	./commons
+	./gateway-service
+	./auth-service
+	./log-service
+	./store-service
+	./task-service
+)
