@@ -17,6 +17,7 @@ type Config struct {
 	MC    *MysqlConfig
 	GRPC  *GrpcConfig
 	ETCD  *EtcdConfig
+	SMTP  *SmtpConfig
 }
 
 // ServerConfig 服务器配置
@@ -37,6 +38,13 @@ type RedisConfig struct {
 	Host     string
 	Password string
 	Db       int
+}
+
+type SmtpConfig struct {
+	Host     string
+	Username string
+	Password string
+	Fromname string
 }
 
 // GrpcConfig grpc配置
@@ -105,4 +113,11 @@ func (c *Config) ReaderServerConfig() {
 	mc.Name = c.viper.GetString("mysql.Name")
 	mc.Password = c.viper.GetString("mysql.Password")
 	c.MC = mc
+	//读取Smtp配置
+	sm := &SmtpConfig{}
+	sm.Host = c.viper.GetString("smtp.Host")
+	sm.Username = c.viper.GetString("smtp.Username")
+	sm.Password = c.viper.GetString("smtp.Password")
+	sm.Fromname = c.viper.GetString("smtp.Fromname")
+	c.SMTP = sm
 }

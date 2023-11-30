@@ -23,7 +23,7 @@ mysql:
   Password: "123698745"
 # 邮件发送配置
 smtp:
-  host: "smtp.fastmail.com"
-  username: "sora@resoras.com"
-  password: "zjjts2b6qlsx6waa"
-  fromname: "notifications@sent.com"
+  Host: "smtp.fastmail.com"
+  Username: "sora@resoras.com"
+  Password: "zjjts2b6qlsx6waa"
+  Fromname: "notifications@sent.com"
