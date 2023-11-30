@@ -1,6 +1,6 @@
 package config
 
-//log-service 服务自己的配置
+//store-service 服务自己的配置
 //数据库配置等
 
 import (

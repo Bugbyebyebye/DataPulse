@@ -25,6 +25,7 @@ type ServerConfig struct {
 	Addr string
 }
 
+// MysqlConfig MySQL配置
 type MysqlConfig struct {
 	Host     string
 	Name     string

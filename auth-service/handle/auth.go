@@ -3,23 +3,25 @@ package handle
 import (
 	"auth-service/config"
 	"auth-service/dao"
+	"auth-service/util"
 	"commons/result"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
-type HandlerUser struct {
+type UserHandler struct {
 	cache config.Cache
 }
 
-func New() *HandlerUser {
-	return &HandlerUser{
+func New() *UserHandler {
+	return &UserHandler{
 		cache: dao.Rc,
 	}
 }
 
 // UserLogin 用户登录
-func (h *HandlerUser) UserLogin(ctx *gin.Context) {
+func (h *UserHandler) UserLogin(ctx *gin.Context) {
 	res := &result.Result{}
 
 	//1.获取参数
@@ -41,23 +43,31 @@ func (h *HandlerUser) UserLogin(ctx *gin.Context) {
 	//		log.Printf("将手机号存入redis成功：REGISTER_%s:%s", mobile, code)
 	//	}
 	//}()
+	token, err := util.CreateToken(10001, "郝建斌")
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
 
-	ctx.JSON(http.StatusOK, res.Success("登录成功"))
+	ctx.JSON(http.StatusOK, res.Success(token))
 }
 
 // UserRegister 用户注册
-func (h *HandlerUser) UserRegister(ctx *gin.Context) {
+func (h *UserHandler) UserRegister(ctx *gin.Context) {
 	res := &result.Result{}
 
 	ctx.JSON(http.StatusOK, res.Success("注册成功"))
 }
 
 // GetUserInfo 获取个人中心信息
-func (h *HandlerUser) GetUserInfo(ctx *gin.Context) {
+func (h *UserHandler) GetUserInfo(ctx *gin.Context) {
+	res := &result.Result{}
 
+	ctx.JSON(http.StatusOK, res.Success(""))
 }
 
 // SetUserInfo 设置个人中心信息
-func (h *HandlerUser) SetUserInfo(ctx *gin.Context) {
+func (h *UserHandler) SetUserInfo(ctx *gin.Context) {
+	res := &result.Result{}
 
+	ctx.JSON(http.StatusOK, res.Success("err"))
 }
