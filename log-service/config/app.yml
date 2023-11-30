@@ -1,11 +1,11 @@
 # Gin web服务配置
 server:
-  Name: "auth-service"
-  Addr: "localhost:8081"
+  Name: "log-service"
+  Addr: "localhost:8082"
 # GRPC 服务配置
 grpc:
-  Name: "auth"
-  Addr: "localhost:9000"
+  Name: "log"
+  Addr: "localhost:9001"
   Version: "1.0"
   Weight: 1
 etcd:
@@ -21,9 +21,3 @@ mysql:
   Host: "localhost:3306"
   Name: "root"
   Password: "123698745"
-# 邮件发送配置
-smtp:
-  host: "smtp.fastmail.com"
-  username: "sora@resoras.com"
-  password: "zjjts2b6qlsx6waa"
-  fromname: "notifications@sent.com"

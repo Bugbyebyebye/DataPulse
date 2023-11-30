@@ -1,14 +1,14 @@
-package auth
+package router
 
 import (
 	"auth-service/handle"
 	"github.com/gin-gonic/gin"
 )
 
-type RouterAuth struct {
+type AuthRouter struct {
 }
 
-func (*RouterAuth) Route(r *gin.Engine) {
+func (*AuthRouter) Route(r *gin.Engine) {
 	auth := handle.New()
 	//登录注册
 	r.POST("/login", auth.UserLogin)
