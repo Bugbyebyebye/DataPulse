@@ -3,8 +3,10 @@ package handle
 import (
 	"auth-service/config"
 	"auth-service/dao"
+	"auth-service/util"
 	"commons/result"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -41,8 +43,12 @@ func (h *HandlerUser) UserLogin(ctx *gin.Context) {
 	//		log.Printf("将手机号存入redis成功：REGISTER_%s:%s", mobile, code)
 	//	}
 	//}()
+	token, err := util.CreateToken(10001, "郝建斌")
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
 
-	ctx.JSON(http.StatusOK, res.Success("登录成功"))
+	ctx.JSON(http.StatusOK, res.Success(token))
 }
 
 // UserRegister 用户注册
@@ -54,10 +60,21 @@ func (h *HandlerUser) UserRegister(ctx *gin.Context) {
 
 // GetUserInfo 获取个人中心信息
 func (h *HandlerUser) GetUserInfo(ctx *gin.Context) {
+	res := &result.Result{}
 
+	ctx.JSON(http.StatusOK, res.Success(""))
 }
 
 // SetUserInfo 设置个人中心信息
 func (h *HandlerUser) SetUserInfo(ctx *gin.Context) {
-
+	res := &result.Result{}
+	token := ctx.PostForm("token")
+	c, err := util.ParseToken(token)
+	if err != nil {
+		//log.Printf("err => %s", err)
+		ctx.JSON(http.StatusOK, res.Fail(400, err.Error()))
+		return
+	}
+	log.Printf("c => %v , %s", c.Id, c.Username)
+	ctx.JSON(http.StatusOK, res.Success(err))
 }

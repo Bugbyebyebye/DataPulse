@@ -1,4 +1,4 @@
-package auth
+package router
 
 import (
 	"auth-service/handle"
