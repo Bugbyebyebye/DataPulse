@@ -10,18 +10,18 @@ import (
 	"net/http"
 )
 
-type UserHandler struct {
+type AuthHandler struct {
 	cache config.Cache
 }
 
-func New() *UserHandler {
-	return &UserHandler{
+func New() *AuthHandler {
+	return &AuthHandler{
 		cache: dao.Rc,
 	}
 }
 
 // UserLogin 用户登录
-func (h *UserHandler) UserLogin(ctx *gin.Context) {
+func (h *AuthHandler) UserLogin(ctx *gin.Context) {
 	res := &result.Result{}
 
 	//1.获取参数
@@ -52,21 +52,21 @@ func (h *UserHandler) UserLogin(ctx *gin.Context) {
 }
 
 // UserRegister 用户注册
-func (h *UserHandler) UserRegister(ctx *gin.Context) {
+func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 	res := &result.Result{}
 
 	ctx.JSON(http.StatusOK, res.Success("注册成功"))
 }
 
 // GetUserInfo 获取个人中心信息
-func (h *UserHandler) GetUserInfo(ctx *gin.Context) {
+func (h *AuthHandler) GetUserInfo(ctx *gin.Context) {
 	res := &result.Result{}
 
 	ctx.JSON(http.StatusOK, res.Success(""))
 }
 
 // SetUserInfo 设置个人中心信息
-func (h *UserHandler) SetUserInfo(ctx *gin.Context) {
+func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 	res := &result.Result{}
 
 	ctx.JSON(http.StatusOK, res.Success("err"))

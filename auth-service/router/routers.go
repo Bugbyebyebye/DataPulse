@@ -2,6 +2,7 @@ package router
 
 import (
 	"auth-service/router/auth"
+	"auth-service/router/file"
 	authservice "auth-service/service"
 	authgrpc "commons/api/auth/gen"
 	"commons/config"
@@ -33,7 +34,8 @@ func (*RegisterRouter) Route(ro Router, r *gin.Engine) {
 
 func InitRouter(r *gin.Engine) {
 	rg := New()
-	rg.Route(&router.AuthRouter{}, r)
+	rg.Route(&authrouter.AuthRouter{}, r)
+	rg.Route(&filerouter.FileRouter{}, r)
 }
 
 // grp配置结构体

@@ -8,6 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/jinzhu/gorm v1.9.16
 	google.golang.org/grpc v1.59.0
+	github.com/qiniu/go-sdk/v7 v7.18.1
 )
 
 require (

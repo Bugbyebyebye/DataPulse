@@ -19,3 +19,14 @@ type Cache interface {
 const (
 	Mysqldb = "root:maojiukeai1412@tcp(222.186.50.126:20134)/df_system?charset=utf8"
 )
+
+// Filepath 文件保存路径
+const Filepath = "./images"
+
+// QinuConfig 七牛云配置
+var QinuConfig = map[string]string{
+	"AccessKey": "bae19QgDWC33GFhS5GQvGJxZbuw1SL5w8Ymt_mIF",
+	"SecretKey": "Vkp-7V8xAR6EoRVSPmhc2TtSlD3pzP6NA9ZrqMP0",
+	"Bucket":    "hjbsport",
+	"Url":       "cdn.emotionalbug.top",
+}
