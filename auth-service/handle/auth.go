@@ -54,7 +54,7 @@ func (h *AuthHandler) UserLogin(ctx *gin.Context) {
 // UserRegister 用户注册
 func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 	res := &result.Result{}
-	s := ctx.GetString("email")
+	s := ctx.Query("email")
 	email, err := util.FormEmail(s)
 	if err != nil {
 		log.Printf("err => %s", err)
