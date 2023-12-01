@@ -11,7 +11,7 @@ grpc:
 etcd:
   Name: "etcd"
   Addrs:
-    - "localhost:2379"
+    - "8.130.84.188:2379"
 # 数据库配置
 redis:
   Host: "localhost:6379"
@@ -25,5 +25,5 @@ mysql:
 smtp:
   Host: "smtp.fastmail.com"
   Username: "sora@resoras.com"
-  Password: "zjjts2b6qlsx6waa"
+  Password: "uysx8mlv49nnhcwk"
   Fromname: "notifications@sent.com"
