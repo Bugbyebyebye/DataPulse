@@ -54,8 +54,12 @@ func (h *AuthHandler) UserLogin(ctx *gin.Context) {
 // UserRegister 用户注册
 func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 	res := &result.Result{}
-
-	ctx.JSON(http.StatusOK, res.Success("注册成功"))
+	s := ctx.GetString("email")
+	email, err := util.FormEmail(s)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	ctx.JSON(http.StatusOK, res.Success(email))
 }
 
 // GetUserInfo 获取个人中心信息

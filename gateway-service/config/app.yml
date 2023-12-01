@@ -6,5 +6,5 @@ server:
 etcd:
   Name: "etcd"
   Addrs:
-    - "localhost:2379"
+    - "8.130.84.188:2379"
 
