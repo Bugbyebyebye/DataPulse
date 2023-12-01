@@ -96,6 +96,9 @@ func (client *SMTP) Init() {
 		defer func() {
 			if err := recover(); err != nil {
 				client.chOpen = false
+				/*
+					todo日志服务
+				*/
 				time.Sleep(time.Duration(10) * time.Second)
 				client.Init()
 			}
@@ -118,6 +121,9 @@ func (client *SMTP) Init() {
 			select {
 			case m, ok := <-client.ch:
 				if !ok {
+					/*
+						todo日志服务
+					*/
 					client.chOpen = false
 					return
 				}
@@ -128,12 +134,21 @@ func (client *SMTP) Init() {
 					open = true
 				}
 				if err := mail.Send(s, m); err != nil {
+					/*
+						todo日志服务
+					*/
 				} else {
+					/*
+						todo日志服务
+					*/
 				}
 			// 长时间没有新邮件，则关闭SMTP连接
 			case <-time.After(time.Duration(client.Config.Keepalive) * time.Second):
 				if open {
 					if err := s.Close(); err != nil {
+						/*
+							todo日志服务
+						*/
 					}
 					open = false
 				}
