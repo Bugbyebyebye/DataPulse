@@ -1,7 +1,7 @@
 # Gin web服务配置
 server:
   Name: "auth-service"
-  Addr: "localhost:8081"
+  Addr: "auth-service:8081"
 # GRPC 服务配置
 grpc:
   Name: "auth"
@@ -11,10 +11,10 @@ grpc:
 etcd:
   Name: "etcd"
   Addrs:
-    - "8.130.84.188:2379"
+    - "etcd:2379"
 # 数据库配置
 redis:
-  Host: "localhost:6379"
+  Host: "redis:6379"
   Password: ""
   Db: 0
 mysql:
