@@ -7,5 +7,6 @@ use (
 	./log-service
 	./store-service
 	./store-service-grpc/mysql-first
+	./store-service-grpc/mysql-second
 	./task-service
 )

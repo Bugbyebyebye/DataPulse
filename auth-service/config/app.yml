@@ -11,16 +11,16 @@ grpc:
 etcd:
   Name: "etcd"
   Addrs:
-    - "8.130.84.188:2379"
+    - "localhost:2379"
 # 数据库配置
 redis:
   Host: "localhost:6379"
   Password: ""
   Db: 0
 mysql:
-  Host: "localhost:3306"
+  Host: "222.186.50.126:20134"
   Name: "root"
-  Password: "123698745"
+  Password: "maojiukeai1412"
 # 邮件发送配置
 smtp:
   Host: "smtp.fastmail.com"

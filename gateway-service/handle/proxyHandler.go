@@ -40,17 +40,17 @@ func ProxyHandler(ctx *gin.Context) {
 	if _, ok := admits[split[1]]; !ok {
 		//鉴权
 		token := ctx.Request.Header.Get("token")
-		log.Printf("token => %s", token)
+		//log.Printf("token => %s", token)
 
 		res, err := client.AuthClient.VerifyToken(ctx, &auth.Req{Token: token})
 		if err != nil {
 			//鉴权失败
 			log.Printf("err => %s", err)
 			if errors.Is(err, jwt.ErrInvalidKey) {
-				ctx.JSON(http.StatusOK, r.Fail(4001, "token 无效！"))
+				ctx.JSON(http.StatusOK, r.Fail(400, "token 无效！"))
 				return
 			} else if errors.Is(err, jwt.ErrTokenExpired) {
-				ctx.JSON(http.StatusOK, r.Fail(4002, "token 过期！"))
+				ctx.JSON(http.StatusOK, r.Fail(400, "token 过期！"))
 				return
 			}
 		}
@@ -59,11 +59,11 @@ func ProxyHandler(ctx *gin.Context) {
 		v := Info{}
 		err = json.Unmarshal(res.Info, &v)
 		if err != nil {
-			ctx.JSON(http.StatusOK, r.Fail(4001, "用户JSON数据解析错误！"))
+			ctx.JSON(http.StatusOK, r.Fail(400, "用户JSON数据解析错误！"))
 			return
 		}
 
-		log.Printf("v => Id:%v Username:%s", v.Id, v.Username)
+		log.Printf("用户 Id:%v Username:%s 登录数据中台", v.Id, v.Username)
 		ctx.Set("id", v.Id)
 		ctx.Set("username", v.Username)
 		//ctx.JSON(200, "成功")

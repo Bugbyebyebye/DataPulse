@@ -13,3 +13,8 @@ func GetResTime() string {
 func GetTodayString() string {
 	return time.Now().Format("20060102150405")
 }
+
+// GetUnixTime 获取当前时间戳
+func GetUnixTime() int64 {
+	return time.Now().UnixNano() / 1e6
+}

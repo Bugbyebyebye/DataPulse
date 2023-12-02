@@ -3,7 +3,7 @@ package register
 //注册GRPC服务
 
 import (
-	"commons/api/bottom/mysql-first"
+	data "commons/api/bottom/mysql-first"
 	"commons/config"
 	"commons/config/etcd"
 	"google.golang.org/grpc"
