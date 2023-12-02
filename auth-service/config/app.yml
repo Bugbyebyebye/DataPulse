@@ -11,10 +11,10 @@ grpc:
 etcd:
   Name: "etcd"
   Addrs:
-    - "localhost:2379"
+    - "8.130.84.188:2379"
 # 数据库配置
 redis:
-  Host: "localhost:6379"
+  Host: "8.130.84.188:6379"
   Password: ""
   Db: 0
 mysql:
