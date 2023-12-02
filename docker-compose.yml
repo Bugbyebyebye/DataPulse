@@ -13,15 +13,36 @@ services:
 #    depends_on:
 #      - my_service  # 这里使用的服务名称需要根据实际情况调整
 #    entrypoint: sh -c 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+# 反向代理
+#  traefik:
+#    image: traefik
+#    command: --api.insecure=true --providers.docker
+#    restart: always
+#    container_name: traefik
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.5'
+#          memory: '2048M'
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - ./Traefik/config:/etc/traefik
+#      - ./Traefik/logs:/etc/traefik/config
+#      - ./Traefik/letsencrypt:/letsencrypt
+
   etcd:
     image: 'bitnami/etcd:latest'
     container_name: etcd
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-    ports:
-      - "2379:2379"
-      - "2380:2380"
+# 生产环境不端口，测试可取消注释
+#    ports:
+#      - "2379:2379"
+#      - "2380:2380"
     volumes:
       - ./etcd_data:/bitnami/etcd
     healthcheck:
@@ -44,13 +65,23 @@ services:
       - redis
     ports:
       - "8080:8080"
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.datapulseapi.rule=Host(`api.example.com`)"
+#      - "traefik.http.routers.datapulseapi.service=datapulseapi"
+#      - "traefik.http.routers.datapulseapi.entrypoints=https"
+#      - "traefik.http.services.datapulseapi.loadbalancer.server.port=8080"
+#      - "traefik.http.routers.datapulseapi.tls=true"
+#      - "traefik.http.routers.datapulseapi.tls.certresolver=myCertResolver"
+#      - "traefik.http.services.datapulseapi.loadbalancer.passhostheader=true"
 
   redis:
     restart: always
     image: redis
     container_name: redis
-    ports:
-      - "6379:6379"
+# 生产环境不端口，测试可取消注释
+#    ports:
+#      - "6379:6379"
     healthcheck:
       test: "redis-cli ping"
       interval: 5s
