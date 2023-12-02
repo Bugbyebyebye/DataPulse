@@ -5,7 +5,7 @@ server:
 # GRPC 服务配置
 grpc:
   Name: "auth"
-  Addr: "localhost:9000"
+  Addr: "auth-service:9000"
   Version: "1.0"
   Weight: 1
 etcd:
