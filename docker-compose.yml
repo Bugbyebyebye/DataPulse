@@ -2,17 +2,17 @@ version: '2'
 
 services:
   # 登录 Docker Hub 的服务
-  login-service:
-    image: alpine
-    command: echo "Logging in to Docker Hub"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - DOCKER_USERNAME="差点就睡着了"
-      - DOCKER_PASSWORD="maojiukeai1412"
-    depends_on:
-      - my_service  # 这里使用的服务名称需要根据实际情况调整
-    entrypoint: sh -c 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+#  login-service:
+#    image: alpine
+#    command: echo "Logging in to Docker Hub"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    environment:
+#      - DOCKER_USERNAME="差点就睡着了"
+#      - DOCKER_PASSWORD="maojiukeai1412"
+#    depends_on:
+#      - my_service  # 这里使用的服务名称需要根据实际情况调整
+#    entrypoint: sh -c 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
   etcd:
     image: 'bitnami/etcd:latest'
     container_name: etcd
@@ -20,27 +20,37 @@ services:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
     ports:
-      - 2379:2379
-      - 2380:2380
+      - "2379:2379"
+      - "2380:2380"
     volumes:
       - ./etcd_data:/bitnami/etcd
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2379/health"]
+      interval: 10s
+      retries: 3
 
   auth-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service:test
     container_name: auth-service
+    depends_on:
+      - etcd
+      - redis
 
   gateway-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service:test
     container_name: gateway-service
+    depends_on:
+      - etcd
+      - redis
     ports:
-      - 8080:8080
+      - "8080:8080"
 
   redis:
     restart: always
     image: redis
     container_name: redis
-    networks:
-      - ./redis:/data
+    ports:
+      - "6379:6379"
     healthcheck:
       test: "redis-cli ping"
       interval: 5s
@@ -51,3 +61,4 @@ services:
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
