@@ -17,13 +17,13 @@ import (
 
 // 转发服务地址
 var hosts = map[string]string{
-	"auth": "localhost:8081",
+	"auth": "auth-service:8081",
 	"log":  "localhost:8082",
 }
 
 // 允许跳过鉴权
 var admits = map[string]string{
-	"auth": "localhost:8081",
+	"auth": "auth-service:8081",
 }
 
 type Info struct {
