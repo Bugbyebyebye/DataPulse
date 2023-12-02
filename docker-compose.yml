@@ -14,11 +14,11 @@ services:
       - ./etcd_data:/bitnami/etcd
 
   auth-service:
-    image: auth-service
+    image: registry.cn-hangzhou.aliyuncs.com/datapulse/auth-service
     container_name: auth-service
 
   gateway-service:
-    image: gateway-service
+    image: registry.cn-hangzhou.aliyuncs.com/datapulse/gateway-service
     container_name: gateway-service
     ports:
       - 8080:8080
