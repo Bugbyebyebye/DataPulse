@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// FormEmail 发送邮件 返回验证码
 func FormEmail(email string) (int, error) {
 
 	config := SMTPConfig{
@@ -24,6 +25,7 @@ func FormEmail(email string) (int, error) {
 		Keepalive:  60,
 	}
 	validate := rand.Intn(10000) + 10000
+
 	client := NewSMTPClient(config)
 	err := client.Send(
 		email,
@@ -33,8 +35,8 @@ func FormEmail(email string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return validate, nil
 
+	return validate, nil
 }
 
 // SMTP SMTP协议发送邮件

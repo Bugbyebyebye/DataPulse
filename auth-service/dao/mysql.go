@@ -13,7 +13,7 @@ var (
 )
 
 func init() {
-	Db, err = gorm.Open("mysql", srv.Conf.MC.Name+":"+srv.Conf.MC.Password+"@tcp("+srv.Conf.MC.Host+")"+"/go_db"+"?charset=utf8")
+	Db, err = gorm.Open("mysql", srv.Conf.MC.Name+":"+srv.Conf.MC.Password+"@tcp("+srv.Conf.MC.Host+")"+"/df_system"+"?charset=utf8mb4&parseTime=True&loc=Local")
 	if err != nil {
 		log.Printf("mysql error: %s", err.Error())
 	}
