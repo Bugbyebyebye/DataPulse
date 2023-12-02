@@ -3,6 +3,7 @@ package util
 import (
 	"commons/config"
 	"github.com/go-mail/mail"
+	"log"
 	"math/rand"
 	"strconv"
 	//"strings"
@@ -29,7 +30,7 @@ func FormEmail(email string) (int, error) {
 	err := client.Send(
 		email,
 		"验证",
-		"Subject: 邮箱验证码\n\n您的邮箱验证码为："+strconv.Itoa(validate),
+		"邮箱验证码\n\n您的邮箱验证码为："+strconv.Itoa(validate),
 	)
 	if err != nil {
 		return 0, err
@@ -98,9 +99,7 @@ func (client *SMTP) Init() {
 		defer func() {
 			if err := recover(); err != nil {
 				client.chOpen = false
-				/*
-					todo日志服务
-				*/
+				log.Printf("发送电子邮件时出现异常： %s，邮件队列将在 10 秒后重置。", err)
 				time.Sleep(time.Duration(10) * time.Second)
 				client.Init()
 			}
@@ -123,9 +122,7 @@ func (client *SMTP) Init() {
 			select {
 			case m, ok := <-client.ch:
 				if !ok {
-					/*
-						todo日志服务
-					*/
+					log.Printf("电子邮件队列关闭......")
 					client.chOpen = false
 					return
 				}
@@ -136,21 +133,15 @@ func (client *SMTP) Init() {
 					open = true
 				}
 				if err := mail.Send(s, m); err != nil {
-					/*
-						todo日志服务
-					*/
+					log.Printf("发送邮件到: %s 失败", err)
 				} else {
-					/*
-						todo日志服务
-					*/
+					log.Printf("邮件已发送")
 				}
 			// 长时间没有新邮件，则关闭SMTP连接
 			case <-time.After(time.Duration(client.Config.Keepalive) * time.Second):
 				if open {
 					if err := s.Close(); err != nil {
-						/*
-							todo日志服务
-						*/
+						log.Printf("关闭 SMTP 连接失败：%s", err)
 					}
 					open = false
 				}
