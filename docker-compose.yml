@@ -1,6 +1,18 @@
 version: '2'
 
 services:
+  # 登录 Docker Hub 的服务
+  login-service:
+    image: alpine
+    command: echo "Logging in to Docker Hub"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_USERNAME="差点就睡着了"
+      - DOCKER_PASSWORD="maojiukeai1412"
+    depends_on:
+      - my_service  # 这里使用的服务名称需要根据实际情况调整
+    entrypoint: sh -c 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
   etcd:
     image: 'bitnami/etcd:latest'
     container_name: etcd
@@ -14,11 +26,11 @@ services:
       - ./etcd_data:/bitnami/etcd
 
   auth-service:
-    image: registry.cn-hangzhou.aliyuncs.com/datapulse/auth-service
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service:test
     container_name: auth-service
 
   gateway-service:
-    image: registry.cn-hangzhou.aliyuncs.com/datapulse/gateway-service
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service:test
     container_name: gateway-service
     ports:
       - 8080:8080
