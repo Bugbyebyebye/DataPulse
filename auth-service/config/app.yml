@@ -1,11 +1,11 @@
 # Gin web服务配置
 server:
   Name: "auth-service"
-  Addr: "auth-service:8081"
+  Addr: "localhost:8081"
 # GRPC 服务配置
 grpc:
   Name: "auth"
-  Addr: "auth-service:9000"
+  Addr: "localhost:9000"
   Version: "1.0"
   Weight: 1
 etcd:
