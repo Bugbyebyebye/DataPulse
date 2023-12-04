@@ -116,6 +116,7 @@ type RegisterReq struct {
 func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 	res := &result.Result{}
 	req := &RegisterReq{}
+	log.Printf("req => %s", req)
 
 	err := ctx.BindJSON(req)
 	if err != nil {
@@ -162,7 +163,7 @@ func (h *AuthHandler) GetUserInfo(ctx *gin.Context) {
 	token := ctx.Request.Header.Get("token")
 	claims, _ := util.ParseToken(token)
 	id := claims.Id
-
+	log.Printf("id => %s", id)
 	//username, ok := ctx.Get("username")
 	if id == 0 {
 		ctx.JSON(200, res.Fail(4001, "用户id获取失败"))
@@ -188,6 +189,7 @@ type InfoReq struct {
 func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 	res := &result.Result{}
 	req := &InfoReq{}
+	log.Printf("req => %s", req)
 
 	token := ctx.Request.Header.Get("token")
 	claims, _ := util.ParseToken(token)
