@@ -42,7 +42,7 @@ func SetUserInfo(userId int, nickname string, desc string, avatar string) error 
 		"Nickname":   nickname,
 		"Desc":       desc,
 		"Avatar":     avatar,
-		"CreateTime": util.GetUnixTime(),
+		"UpdateTime": util.GetUnixTime(),
 	}).Error
 	return err
 }
