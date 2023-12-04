@@ -123,6 +123,7 @@ type RegisterReq struct {
 func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 	res := &result.Result{}
 	req := &RegisterReq{}
+	log.Printf("req => %s", req)
 
 	err := ctx.BindJSON(req)
 	if err != nil {
@@ -169,7 +170,7 @@ func (h *AuthHandler) GetUserInfo(ctx *gin.Context) {
 	token := ctx.Request.Header.Get("token")
 	claims, _ := util.ParseToken(token)
 	id := claims.Id
-
+	log.Printf("id => %s", id)
 	//username, ok := ctx.Get("username")
 	if id == 0 {
 		ctx.JSON(200, res.Fail(4001, "用户id获取失败"))
@@ -194,7 +195,8 @@ type InfoReq struct {
 // SetUserInfo 设置个人中心信息
 func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 	res := &result.Result{}
-	req := &AccountReq{}
+	req := &InfoReq{}
+	log.Printf("req => %s", req)
 
 	token := ctx.Request.Header.Get("token")
 	claims, _ := util.ParseToken(token)
@@ -206,7 +208,7 @@ func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	err = model.SetUserInfo(id, req.Username, req.Password, req.Email)
+	err = model.SetUserInfo(id, req.Nickname, req.Desc, req.Avatar)
 	if err != nil {
 		log.Printf("mysql error => %s", err)
 		ctx.JSON(200, res.Fail(4001, "更新失败！"))
