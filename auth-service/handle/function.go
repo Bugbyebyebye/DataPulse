@@ -62,6 +62,6 @@ func (*AuthHandler) PostEmailCode(ctx *gin.Context) {
 		return
 	}
 	//将验证码存入redis 有效时间3min
-	dao.Rc.Put(context.Background(), "DATAPULSE"+req.Email, strconv.Itoa(code), 60*time.Minute)
+	dao.Rc.Put(context.Background(), "DATAPULSE"+req.Email, strconv.Itoa(code), 3*time.Minute)
 	ctx.JSON(200, res.Success("验证码发送成功！"))
 }

@@ -134,6 +134,12 @@ func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 	//校验验证码
 	if req.Code == code {
 		//邮箱验证码校验成功
+		_, err := model.GetUserByUsername(req.Username)
+		if err == nil {
+			ctx.JSON(200, res.Fail(4001, "该用户名已注册，请重新输入！"))
+			return
+		}
+
 		id, err := model.InsertUser(req.Username, req.Password, req.Email)
 		if err != nil {
 			log.Printf("mysql error => %s", err)

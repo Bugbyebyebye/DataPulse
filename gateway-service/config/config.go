@@ -27,8 +27,9 @@ const (
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Expose-Headers", "Access-Control-Allow-Origin")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		c.Writer.Header().Set("Access-Control-Expose-Headers", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "*")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
@@ -41,7 +42,6 @@ func Cors() gin.HandlerFunc {
 				log.Printf("Panic info is: %s", debug.Stack())
 			}
 		}()
-
 		c.Next()
 	}
 }
