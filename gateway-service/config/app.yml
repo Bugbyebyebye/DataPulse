@@ -1,7 +1,7 @@
 # Gin web服务配置
 server:
   Name: "gateway-service"
-  Addr: "localhost:8080"
+  Addr: "gateway-service:8080"
 # GRPC 服务配置
 etcd:
   Name: "etcd"
