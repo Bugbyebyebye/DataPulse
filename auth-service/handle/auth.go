@@ -34,6 +34,13 @@ type LoginReq struct {
 	Code     int    `json:"code"`
 }
 
+// AccountReq 初始化账号结构体
+type AccountReq struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
 // UserLogin 用户登录
 func (h *AuthHandler) UserLogin(ctx *gin.Context) {
 	res := &result.Result{}
@@ -187,7 +194,7 @@ type InfoReq struct {
 // SetUserInfo 设置个人中心信息
 func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 	res := &result.Result{}
-	req := &InfoReq{}
+	req := &AccountReq{}
 
 	token := ctx.Request.Header.Get("token")
 	claims, _ := util.ParseToken(token)
@@ -199,7 +206,7 @@ func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	err = model.SetUserInfo(id, req.Nickname, req.Desc, req.Avatar)
+	err = model.SetUserInfo(id, req.Username, req.Password, req.Email)
 	if err != nil {
 		log.Printf("mysql error => %s", err)
 		ctx.JSON(200, res.Fail(4001, "更新失败！"))
@@ -207,4 +214,52 @@ func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 	}
 	user, err := model.GetUserInfoByUserId(id)
 	ctx.JSON(http.StatusOK, res.Success(user))
+}
+
+// SetAccount 更改账号信息
+func (h *AuthHandler) SetAccount(ctx *gin.Context) {
+	res := &result.Result{}
+	token := ctx.Request.Header.Get("token")
+	claims, _ := util.ParseToken(token)
+	id := claims.Id
+	req := &RegisterReq{}
+
+	err := ctx.BindJSON(req)
+	if err != nil {
+		log.Printf("json数据错误 err => %s", err)
+		ctx.JSON(http.StatusOK, res.Fail(400, "json数据错误！"))
+		return
+	}
+	log.Printf("req %s", req)
+	//从redis获取验证码
+	codeStr, err := dao.Rc.Get(context.Background(), "DATAPULSE"+req.Email)
+	if err != nil {
+		log.Printf("redis error => %s", err)
+	}
+	code, _ := strconv.Atoi(codeStr)
+
+	//校验验证码
+	if req.Code == code {
+		//邮箱验证码校验成功
+		//如果通过token获取的username不等于username的话，重复之后return
+		user, err := model.GetUserByAccount(id)
+		if !(user.Username == req.Username) {
+			_, err := model.GetUserByUsername(req.Username)
+			if err == nil {
+				ctx.JSON(200, res.Fail(4001, "用户名重复,请更改用户名！"))
+				return
+			}
+		}
+
+		err = model.SetAccount(id, req.Username, req.Password, req.Email)
+		if err != nil {
+			log.Printf("mysql error => %s", err)
+			return
+		}
+		ctx.JSON(200, res.Success("更新成功！"))
+		return
+	} else {
+		ctx.JSON(200, res.Fail(4001, "验证码输入错误！"))
+		return
+	}
 }
