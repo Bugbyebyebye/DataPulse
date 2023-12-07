@@ -49,6 +49,6 @@
     * grpc 数据读取存储服务
     * mysql1 grpc :9002
     * mysql2 grpc :9003
-    * mongodb grpc :9004
+  * mongo grpc :9004
 * task-service :8084
     * grpc 服务暂定 :9005

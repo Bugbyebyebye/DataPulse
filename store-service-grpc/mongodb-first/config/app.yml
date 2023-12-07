@@ -1,6 +1,6 @@
 grpc:
-  Name: "mysql2"
-  addr: "localhost:9003"
+  Name: "mongo1"
+  addr: "localhost:9004"
   Version: "1.0"
   Weight: 1
 

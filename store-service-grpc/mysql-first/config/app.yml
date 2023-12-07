@@ -1,6 +1,6 @@
 grpc:
-  Name: "data"
-  addr: "localhost:8082"
+  Name: "mysql1"
+  addr: "localhost:9002"
   Version: "1.0"
   Weight: 1
 

@@ -1,6 +1,6 @@
 package main
 
-import "mysql-second/config/register"
+import "mongodb-first/config/register"
 
 func main() {
 	register.EtcdServerRegister()
