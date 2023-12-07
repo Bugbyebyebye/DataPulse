@@ -21,5 +21,4 @@ func (*AuthRouter) Route(r *gin.Engine) {
 	r.POST("/setInfo", auth.SetUserInfo)
 	//账号信息相关
 	r.POST("/setAccount", auth.SetAccount)
-
 }
