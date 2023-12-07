@@ -13,4 +13,6 @@ func (*Filter) Route(r *gin.Engine) {
 	//log-service 服务
 	r.Any("/auth/*path", handle.ProxyHandler)
 	r.Any("/log/*path", handle.ProxyHandler)
+	r.Any("/store/*path", handle.ProxyHandler)
+	r.Any("/task/*path", handle.ProxyHandler)
 }

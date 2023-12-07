@@ -18,8 +18,9 @@ import (
 // 转发服务地址
 var hosts = map[string]string{
 	"auth":  "localhost:8081",
-	"store": "localhost:8083",
 	"log":   "localhost:8082",
+	"store": "localhost:8083",
+	"task":  "localhost:8084",
 }
 
 // 允许跳过鉴权

@@ -3,14 +3,33 @@ package mongodb_service
 import (
 	mongo "commons/api/bottom/mongodb_first/gen"
 	"context"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"encoding/json"
+	"log"
 )
 
 type MongoFirstService struct {
 	mongo.UnimplementedMongoDbFirstServiceServer
 }
 
-func (MongoFirstService) GetMongoDbFirstData(context.Context, *mongo.Req) (*mongo.Res, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMongoDbFirstData not implemented")
+type ClientReq struct {
+	Message string `json:"message"`
+}
+
+type ServerRes struct {
+	Message string `json:"message"`
+}
+
+func (MongoFirstService) GetMongoDbFirstData(ctx context.Context, req *mongo.MongoFirstReq) (res *mongo.MongoFirstRes, err error) {
+	var cq ClientReq
+	err = json.Unmarshal(req.Param, &cq)
+	log.Printf("来自客户端的请求信息为 =>  %+v", cq)
+
+	sr := ServerRes{Message: "你好，我是 mongo1 grpc服务"}
+	data, err := json.Marshal(sr)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	return &mongo.MongoFirstRes{
+		Data: data,
+	}, nil
 }

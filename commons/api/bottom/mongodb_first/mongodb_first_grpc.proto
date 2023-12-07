@@ -4,16 +4,16 @@ syntax = "proto3";
 package grpc;
 option go_package = "./gen";
 
-message Req{
+message MongoFirstReq{
   bytes param = 1;
 }
 
-message Res{
+message MongoFirstRes{
   bytes data = 1;
 }
 
 service MongoDbFirstService{
-  rpc GetMongoDbFirstData(Req) returns (Res){}
+  rpc GetMongoDbFirstData(MongoFirstReq) returns (MongoFirstRes){}
 }
 
 //终端执行命令
