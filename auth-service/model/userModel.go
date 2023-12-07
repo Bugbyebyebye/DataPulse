@@ -50,3 +50,22 @@ func InitUser(username string, password string, email string) (int, error) {
 	create := dao.Db.Create(&user)
 	return user.UserId, create.Error
 }
+
+// GetUserByAccount 通过用户id获取用户信息
+func GetUserByAccount(userId int) (User, error) {
+	var user User
+	err := dao.Db.Select("user_id, username, email, create_time, update_time").Where("user_id = ?", userId).First(&user).Error
+	return user, err
+}
+
+// SetAccount 更新用户账号信息(邮箱，账号，密码)
+func SetAccount(userId int, Username string, Password string, Email string) error {
+	var user User
+	err := dao.Db.Model(&user).Where("user_id = ?", userId).Updates(map[string]interface{}{
+		"Username":   Username,
+		"Password":   Password,
+		"Email":      Email,
+		"UpdateTime": util.GetUnixTime(),
+	}).Error
+	return err
+}
