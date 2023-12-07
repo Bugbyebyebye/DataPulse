@@ -1,0 +1,20 @@
+//编写proto文件
+syntax = "proto3";
+
+package grpc;
+option go_package = "./gen";
+
+message Req{
+  bytes param = 1;
+}
+
+message Res{
+  bytes data = 1;
+}
+
+service MysqlFirstService{
+  rpc GetMysqlFirstData(Req) returns (Res){}
+}
+
+//终端执行命令
+//E:\codeWork\go\test\project-grpc\api\proto> protoc --go_out=./gen --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_out=paths=source_relative data.proto

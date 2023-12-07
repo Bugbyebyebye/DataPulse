@@ -1,31 +1,14 @@
 package router
 
 import (
+	routers "commons/router"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	router "log-service/router/log"
 )
 
-// Router 路由接口
-type Router interface {
-	Route(r *gin.Engine)
-}
-
-// RegisterRouter 注册路由初始化方法
-type RegisterRouter struct {
-}
-
-func New() *RegisterRouter {
-	return &RegisterRouter{}
-}
-
-// Route 路由封装类
-func (*RegisterRouter) Route(ro Router, r *gin.Engine) {
-	ro.Route(r)
-}
-
 func InitRouter(r *gin.Engine) {
-	rg := New()
+	rg := routers.New()
 	rg.Route(&router.LogRouter{}, r)
 }
 

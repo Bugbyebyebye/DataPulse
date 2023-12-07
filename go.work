@@ -8,5 +8,6 @@ use (
 	./store-service
 	./store-service-grpc/mysql-first
 	./store-service-grpc/mysql-second
+	./store-service-grpc/mongodb-first
 	./task-service
 )
