@@ -40,6 +40,8 @@ func RegisterGrpc() *grpc.Server {
 	listen, err := net.Listen("tcp", c.Addr)
 	if err != nil {
 		log.Println("cannot listen")
+	} else {
+		log.Printf("grpc服务【%s】已启动! 运行在 => %s", c.Name, c.Addr)
 	}
 	go func() {
 		err = server.Serve(listen)

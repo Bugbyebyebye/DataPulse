@@ -4,16 +4,16 @@ syntax = "proto3";
 package grpc;
 option go_package = "./gen";
 
-message Req{
+message MysqlSecondReq{
   bytes param = 1;
 }
 
-message Res{
+message MysqlSecondRes{
   bytes data = 1;
 }
 
 service MysqlSecondService{
-  rpc GetMysqlSecondData(Req) returns (Res){}
+  rpc GetMysqlSecondData(MysqlSecondReq) returns (MysqlSecondRes){}
 }
 
 //终端执行命令

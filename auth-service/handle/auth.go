@@ -7,6 +7,7 @@ import (
 	"commons/result"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
@@ -260,7 +261,18 @@ func (h *AuthHandler) SetAccount(ctx *gin.Context) {
 	claims, _ := util.ParseToken(token)
 	id := claims.Id
 	req := &RegisterReq{}
+	user, _ := model.GetUserByAccount(id)
 
+	if req.Email == "" {
+		req.Email = user.Email
+	}
+	fmt.Printf(req.Email)
+	if req.Username == "" {
+		req.Username = user.Username
+	}
+	if req.Password == "" {
+		req.Password = user.Password
+	}
 	err := ctx.BindJSON(req)
 	if err != nil {
 		log.Printf("json数据错误 err => %s", err)
@@ -290,7 +302,7 @@ func (h *AuthHandler) SetAccount(ctx *gin.Context) {
 
 		err = model.SetAccount(id, req.Username, req.Password, req.Email)
 		if err != nil {
-			log.Printf("mysql error => %s", err)
+			fmt.Printf("mysql error => %s", err)
 			return
 		}
 		ctx.JSON(200, res.Success("更新成功！"))
