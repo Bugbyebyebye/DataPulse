@@ -17,15 +17,15 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: registry.cn-hangzhou.aliyuncs.com
-          username: ${{ secrets.ALIYUN_USER }}
-          password: ${{ secrets.ALIYUN_PASSWORD }}
+          username: "差点就睡着了"
+          password: "maojiukeai1412"
 
       - name: Build and push auth-service
         run: |
-          docker build -t registry.cn-hangzhou.aliyuncs.com/datapulse/auth-service -f Dockerfile.auth-service .
-          docker push registry.cn-hangzhou.aliyuncs.com/datapulse/auth-service
+          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service -f Dockerfile.auth-service .
+          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service
 
       - name: Build and push gateway-service
         run: |
-          docker build -t registry.cn-hangzhou.aliyuncs.com/datapulse/gateway-service -f Dockerfile.gateway-service .
-          docker push registry.cn-hangzhou.aliyuncs.com/datapulse/gateway-service
+          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service -f Dockerfile.gateway-service .
+          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service
