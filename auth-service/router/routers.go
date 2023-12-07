@@ -1,11 +1,12 @@
 package router
 
 import (
-	router "auth-service/router/auth"
+	auth "auth-service/router/auth"
 	authservice "auth-service/service"
 	authgrpc "commons/api/auth/gen"
 	"commons/config"
 	"commons/config/etcd"
+	routers "commons/router"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/resolver"
@@ -13,27 +14,9 @@ import (
 	"net"
 )
 
-// Router 路由接口
-type Router interface {
-	Route(r *gin.Engine)
-}
-
-// RegisterRouter 注册路由初始化方法
-type RegisterRouter struct {
-}
-
-func New() *RegisterRouter {
-	return &RegisterRouter{}
-}
-
-// Route 路由封装类
-func (*RegisterRouter) Route(ro Router, r *gin.Engine) {
-	ro.Route(r)
-}
-
 func InitRouter(r *gin.Engine) {
-	rg := New()
-	rg.Route(&router.AuthRouter{}, r)
+	rg := routers.New()
+	rg.Route(&auth.AuthRouter{}, r)
 }
 
 // grp配置结构体
@@ -57,6 +40,8 @@ func RegisterGrpc() *grpc.Server {
 	listen, err := net.Listen("tcp", c.Addr)
 	if err != nil {
 		log.Println("cannot listen")
+	} else {
+		log.Printf("grpc服务【%s】已启动! 运行在 => %s", c.Name, c.Addr)
 	}
 	go func() {
 		err = server.Serve(listen)

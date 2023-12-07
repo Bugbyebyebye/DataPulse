@@ -3,13 +3,13 @@ package register
 //注册GRPC服务
 
 import (
-	data "commons/api/bottom/mysql-first"
+	mysqlgrpc "commons/api/bottom/mysql-first/gen"
 	"commons/config"
 	"commons/config/etcd"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/resolver"
 	"log"
-	DataService "mysql-first/service"
+	mysqlService "mysql-first/service"
 	"net"
 )
 
@@ -26,7 +26,7 @@ func GrpcRegister() {
 		Name: config.Conf.GRPC.Name,
 		Addr: config.Conf.GRPC.Addr,
 		RegisterFunc: func(g *grpc.Server) {
-			data.RegisterDataServiceServer(g, &DataService.DataService{})
+			mysqlgrpc.RegisterMysqlFirstServiceServer(g, &mysqlService.MysqlFirstService{})
 		},
 	}
 	server := grpc.NewServer()

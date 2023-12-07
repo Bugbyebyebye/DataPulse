@@ -42,26 +42,23 @@ func (*AuthHandler) UploadPic(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, r.Success(url))
 }
 
-type EmailReq struct {
-	Email string `json:"email"`
-}
-
 // PostEmailCode 发送邮箱验证码接口
 func (*AuthHandler) PostEmailCode(ctx *gin.Context) {
 	res := &result.Result{}
-	req := &EmailReq{}
-	err := ctx.BindJSON(req)
-	if err != nil {
-		log.Printf("email error => %s ", err)
+
+	email := ctx.Query("email")
+	log.Printf("email => %s", email)
+	if email == "" {
+		ctx.JSON(200, res.Fail(4001, "邮箱不能为空！"))
 		return
 	}
 
-	code, err := util.FormEmail(req.Email)
+	code, err := util.FormEmail(email)
 	if err != nil {
 		log.Printf("post email error => %s", err)
 		return
 	}
 	//将验证码存入redis 有效时间3min
-	dao.Rc.Put(context.Background(), "DATAPULSE"+req.Email, strconv.Itoa(code), 3*time.Minute)
+	dao.Rc.Put(context.Background(), "DATAPULSE"+email, strconv.Itoa(code), 3*time.Minute)
 	ctx.JSON(200, res.Success("验证码发送成功！"))
 }
