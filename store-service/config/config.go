@@ -17,5 +17,5 @@ type Cache interface {
 
 // Mysqldb mysql 配置
 const (
-	Mysqldb = "root:maojiukeai1412@tcp(222.186.50.126:20134)/df_system?charset=utf8"
+	Mysqldb = "root:maojiukeai1412@tcp(222.186.50.126:20134)/df_warehouse?charset=utf8"
 )

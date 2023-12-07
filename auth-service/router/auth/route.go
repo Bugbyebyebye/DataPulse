@@ -13,7 +13,6 @@ func (*AuthRouter) Route(r *gin.Engine) {
 	//功能路由
 	r.GET("/code", auth.PostEmailCode)
 	r.POST("/file", auth.UploadPic)
-
 	//登录注册
 	r.POST("/login", auth.UserLogin)
 	r.POST("/register", auth.UserRegister)

@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"auth-service/config"
 	"auth-service/dao"
 	"auth-service/model"
 	"auth-service/util"
@@ -16,16 +15,6 @@ import (
 	"strconv"
 )
 
-type AuthHandler struct {
-	cache config.Cache
-}
-
-func New() *AuthHandler {
-	return &AuthHandler{
-		cache: dao.Rc,
-	}
-}
-
 type LoginReq struct {
 	Type     int    `json:"type"`
 	Username string `json:"username"`
@@ -34,8 +23,15 @@ type LoginReq struct {
 	Code     int    `json:"code"`
 }
 
+type LoginRes struct {
+	Token     string `json:"token"`
+	UserId    int    `json:"user_id"`
+	Role      string `json:"role"`
+	Authority int    `json:"authority"`
+}
+
 // UserLogin 用户登录
-func (h *AuthHandler) UserLogin(ctx *gin.Context) {
+func (*AuthHandler) UserLogin(ctx *gin.Context) {
 	res := &result.Result{}
 	req := &LoginReq{}
 
@@ -46,7 +42,7 @@ func (h *AuthHandler) UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	log.Printf("req => %s", req)
+	log.Printf("req => %+v\n", req)
 
 	if req.Type == 1 {
 		//邮箱验证码登录
@@ -69,11 +65,18 @@ func (h *AuthHandler) UserLogin(ctx *gin.Context) {
 					return
 				}
 			}
-			token, err := util.CreateToken(user.UserId, user.Username)
+			token, err := util.CreateToken(user.UserId, user.Username, user.Role, user.Authority)
 			if err != nil {
 				log.Printf("token err => %s", err)
 			}
-			ctx.JSON(200, res.Success(token))
+
+			var data LoginRes
+			data.UserId = user.UserId
+			data.Token = token
+			data.Role = user.Role
+			data.Authority = user.Authority
+
+			ctx.JSON(http.StatusOK, res.Success(data))
 			return
 		} else {
 			ctx.JSON(200, res.Fail(4001, "验证码错误！"))
@@ -92,11 +95,18 @@ func (h *AuthHandler) UserLogin(ctx *gin.Context) {
 
 		if user.Password == req.Password {
 			//登录成功
-			token, err := util.CreateToken(user.UserId, user.Username)
+			token, err := util.CreateToken(user.UserId, user.Username, user.Role, user.Authority)
 			if err != nil {
 				log.Printf("err => %s", err)
 			}
-			ctx.JSON(http.StatusOK, res.Success(token))
+
+			var data LoginRes
+			data.UserId = user.UserId
+			data.Token = token
+			data.Role = user.Role
+			data.Authority = user.Authority
+
+			ctx.JSON(http.StatusOK, res.Success(data))
 
 		} else {
 			//校验密码错误
@@ -113,10 +123,9 @@ type RegisterReq struct {
 }
 
 // UserRegister 用户注册
-func (h *AuthHandler) UserRegister(ctx *gin.Context) {
+func (*AuthHandler) UserRegister(ctx *gin.Context) {
 	res := &result.Result{}
 	req := &RegisterReq{}
-	log.Printf("req => %s", req)
 
 	err := ctx.BindJSON(req)
 	if err != nil {
@@ -124,11 +133,20 @@ func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, res.Fail(400, "json数据错误！"))
 		return
 	}
-	log.Printf("req %s", req)
+
+	log.Printf("req => %+v\n", req)
+	//判断参数是否为空
+	if req.Code == 0 && req.Email == "" && req.Username == "" && req.Password == "" {
+		ctx.JSON(http.StatusOK, res.Fail(400, "参数不能为空！"))
+		return
+	}
+
 	//从redis获取验证码
 	codeStr, err := dao.Rc.Get(context.Background(), "DATAPULSE"+req.Email)
 	if err != nil {
 		log.Printf("redis error => %s", err)
+		ctx.JSON(http.StatusOK, res.Fail(400, "验证码错误！"))
+		return
 	}
 	code, _ := strconv.Atoi(codeStr)
 
@@ -141,7 +159,7 @@ func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 			return
 		}
 
-		id, err := model.InsertUser(req.Username, req.Password, req.Email)
+		id, err := model.InitUser(req.Username, req.Password, req.Email)
 		if err != nil {
 			log.Printf("mysql error => %s", err)
 			return
@@ -156,27 +174,50 @@ func (h *AuthHandler) UserRegister(ctx *gin.Context) {
 	}
 }
 
+// UserInfoRes 用户信息
+type UserInfoRes struct {
+	Username   string `json:"username"`
+	Email      string `json:"email"`
+	Nickname   string `json:"nickname"`
+	Desc       string `json:"desc"`
+	CreateTime int64  `json:"create_time"`
+	Avatar     string `json:"avatar"`
+}
+
 // GetUserInfo 获取个人中心信息
-func (h *AuthHandler) GetUserInfo(ctx *gin.Context) {
+func (*AuthHandler) GetUserInfo(ctx *gin.Context) {
 	res := &result.Result{}
 
 	token := ctx.Request.Header.Get("token")
 	claims, _ := util.ParseToken(token)
 	id := claims.Id
-	log.Printf("id => %s", id)
+	log.Printf("id => %v", id)
 	//username, ok := ctx.Get("username")
 	if id == 0 {
 		ctx.JSON(200, res.Fail(4001, "用户id获取失败"))
 		return
 	}
 
-	user, err := model.GetUserInfoByUserId(id)
+	info, err := model.GetUserInfoByUserId(id)
+	if err != nil {
+		log.Printf("mysql error => %s", err)
+		return
+	}
+	user, err := model.GetUserById(id)
 	if err != nil {
 		log.Printf("mysql error => %s", err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, res.Success(user))
+	var data UserInfoRes
+	data.Username = user.Username
+	data.Email = user.Email
+	data.Nickname = info.Nickname
+	data.Desc = info.Desc
+	data.Avatar = info.Avatar
+	data.CreateTime = user.CreateTime
+
+	ctx.JSON(http.StatusOK, res.Success(data))
 }
 
 type InfoReq struct {
@@ -186,7 +227,7 @@ type InfoReq struct {
 }
 
 // SetUserInfo 设置个人中心信息
-func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
+func (*AuthHandler) SetUserInfo(ctx *gin.Context) {
 	res := &result.Result{}
 	req := &InfoReq{}
 	log.Printf("req => %s", req)
@@ -200,6 +241,7 @@ func (h *AuthHandler) SetUserInfo(ctx *gin.Context) {
 		log.Printf("json error => %s", err)
 		return
 	}
+	log.Printf("req => %+v\n", req)
 
 	err = model.SetUserInfo(id, req.Nickname, req.Desc, req.Avatar)
 	if err != nil {

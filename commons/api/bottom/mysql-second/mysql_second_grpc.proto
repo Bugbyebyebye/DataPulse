@@ -1,19 +1,19 @@
 //编写proto文件
 syntax = "proto3";
 
-package data;
+package grpc;
 option go_package = "./gen";
 
 message Req{
-  int64 id = 1;
+  bytes param = 1;
 }
 
 message Res{
-  string data = 1;
+  bytes data = 1;
 }
 
-service DataService{
-  rpc GetDataInfo(Req) returns (Res){}
+service MysqlSecondService{
+  rpc GetMysqlSecondData(Req) returns (Res){}
 }
 
 //终端执行命令

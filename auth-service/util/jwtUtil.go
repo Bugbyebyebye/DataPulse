@@ -8,8 +8,10 @@ import (
 
 // MyClaims 生成和校验jwt token
 type MyClaims struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
+	Id        int    `json:"id"`
+	Username  string `json:"username"`
+	Role      string `json:"role"`
+	Authority int    `json:"Authority"`
 	jwt.RegisteredClaims
 }
 
@@ -19,10 +21,12 @@ const TokenExpireDuration = time.Hour * 24 * 7
 var MySecret = []byte("DataPulse")
 
 // CreateToken 生成JwtToken
-func CreateToken(id int, username string) (string, error) {
+func CreateToken(id int, username string, role string, authority int) (string, error) {
 	c := MyClaims{
-		Id:       id,
-		Username: username,
+		Id:        id,
+		Username:  username,
+		Role:      role,
+		Authority: authority,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExpireDuration)), //有效时间
 			IssuedAt:  jwt.NewNumericDate(time.Now()),                          // 签发时间
