@@ -3,11 +3,11 @@ name: Build and Push Docker Images
 on:
   push:
     branches:
-      - main  # 可以根据你的需求更改触发条件
+      - pro-docker  # 可以根据你的需求更改触发条件
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest  # 使用 Ubuntu 系统环境
+    runs-on: localhost  # 使用 Ubuntu 系统环境
 
     steps:
       - name: Checkout code
