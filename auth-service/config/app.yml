@@ -11,7 +11,7 @@ grpc:
 etcd:
   Name: "etcd"
   Addrs:
-    - "8.130.84.188:2379"
+    - "localhost:2379"
 # 数据库配置
 redis:
   Host: "8.130.84.188:6379"
