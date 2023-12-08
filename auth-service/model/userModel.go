@@ -44,11 +44,14 @@ func GetUserByEmail(email string) (User, error) {
 	return user, err
 }
 
-// InitUser 新增用户数据
-func InitUser(username string, password string, email string) (int, error) {
-	user := User{Username: username, Password: password, Email: email, Role: "user", Authority: 0, State: 0, CreateTime: util.GetUnixTime()}
-	create := dao.Db.Create(&user)
-	return user.UserId, create.Error
+// GetUserList 获取用户列表
+func GetUserList() ([]User, error) {
+	var userList []User
+	err := dao.Db.Where("state = ?", 1).Find(&userList).Error
+	if err != nil {
+		return nil, err
+	}
+	return userList, nil
 }
 
 // GetUserByAccount 通过用户id获取用户信息
@@ -58,6 +61,13 @@ func GetUserByAccount(userId int) (User, error) {
 	return user, err
 }
 
+// InitUser 新增用户数据
+func InitUser(username string, password string, email string) (int, error) {
+	user := User{Username: username, Password: password, Email: email, Role: "user", Authority: 0, State: 0, CreateTime: util.GetUnixTime()}
+	create := dao.Db.Create(&user)
+	return user.UserId, create.Error
+}
+
 // SetAccount 更新用户账号信息(邮箱，账号，密码)
 func SetAccount(userId int, Username string, Password string, Email string) error {
 	var user User
@@ -65,6 +75,36 @@ func SetAccount(userId int, Username string, Password string, Email string) erro
 		"Username":   Username,
 		"Password":   Password,
 		"Email":      Email,
+		"UpdateTime": util.GetUnixTime(),
+	}).Error
+	return err
+}
+
+// SetUserRole 设置用户角色
+func SetUserRole(userId int, role string) error {
+	var user User
+	err := dao.Db.Model(&user).Where("user_id = ?", userId).Updates(map[string]interface{}{
+		"Role":       role,
+		"UpdateTime": util.GetUnixTime(),
+	}).Error
+	return err
+}
+
+// SetUserAuthority 设置用户权限
+func SetUserAuthority(userId int, authority int) error {
+	var user User
+	err := dao.Db.Model(&user).Where("user_id = ?", userId).Updates(map[string]interface{}{
+		"Authority":  authority,
+		"UpdateTime": util.GetUnixTime(),
+	}).Error
+	return err
+}
+
+// DeleteUser 逻辑删除用户记录
+func DeleteUser(userId int) error {
+	var user User
+	err := dao.Db.Model(&user).Where("user_id = ?", userId).Updates(map[string]interface{}{
+		"State":      0,
 		"UpdateTime": util.GetUnixTime(),
 	}).Error
 	return err
