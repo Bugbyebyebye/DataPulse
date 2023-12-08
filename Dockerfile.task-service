@@ -1,0 +1,8 @@
+FROM golang:latest
+WORKDIR /app
+
+COPY . .
+RUN go env -w GO111MODULE=auto
+RUN go build -o ./task-service/main ./task-service/main.go
+WORKDIR /app/task-service
+ENTRYPOINT ["./main"]

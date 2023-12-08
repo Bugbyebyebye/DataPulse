@@ -1,0 +1,9 @@
+# 构建log镜像
+FROM golang:latest
+WORKDIR /app
+
+COPY . .
+RUN go env -w GO111MODULE=auto
+RUN go build -o ./log-service/main ./log-service/main.go
+WORKDIR /app/log-service
+ENTRYPOINT ["./main"]

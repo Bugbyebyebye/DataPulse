@@ -51,14 +51,14 @@ services:
       retries: 3
 
   auth-service:
-    image: registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service:test
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service:latest
     container_name: auth-service
     depends_on:
       - etcd
       - redis
 
   gateway-service:
-    image: registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service:test
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service:latest
     container_name: gateway-service
     depends_on:
       - etcd
@@ -74,6 +74,48 @@ services:
 #      - "traefik.http.routers.datapulseapi.tls=true"
 #      - "traefik.http.routers.datapulseapi.tls.certresolver=myCertResolver"
 #      - "traefik.http.services.datapulseapi.loadbalancer.passhostheader=true"
+
+  log-service:
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/log-service:latest
+    container_name: log-service
+    depends_on:
+      - etcd
+      - redis
+
+  task-service:
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/task-service:latest
+    container_name: task-service
+    depends_on:
+      - etcd
+      - redis
+
+  store-service:
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/store-service:latest
+    container_name: store-service
+    depends_on:
+      - etcd
+      - redis
+
+  mongodb-first:
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first:latest
+    container_name: mongodb-first
+    depends_on:
+      - etcd
+      - redis
+
+  mysql-first:
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-first:latest
+    container_name: mysql-first
+    depends_on:
+      - etcd
+      - redis
+
+  mysql-second:
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-second:latest
+    container_name: mysql-second
+    depends_on:
+      - etcd
+      - redis
 
   redis:
     restart: always
