@@ -45,10 +45,6 @@ services:
 #      - "2380:2380"
     volumes:
       - ./etcd_data:/bitnami/etcd
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:2379/health"]
-      interval: 10s
-      retries: 3
 
   auth-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service:latest
@@ -124,10 +120,6 @@ services:
 # 生产环境不端口，测试可取消注释
 #    ports:
 #      - "6379:6379"
-    healthcheck:
-      test: "redis-cli ping"
-      interval: 5s
-      retries: 20
 
   dockerupdate:
     image: containrrr/watchtower
