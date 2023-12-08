@@ -1,12 +1,12 @@
 # Gin web服务配置
 server:
   Name: "store-service"
-  Addr: "localhost:8083"
+  Addr: "store-service:8083"
 # GRPC 服务配置
 etcd:
   Name: "etcd"
   Addrs:
-    - "8.130.84.188:2379"
+    - "etcd:2379"
 # 数据库配置
 mysql:
   Host: "222.186.50.126:20134"
