@@ -8,7 +8,7 @@ type ClientReq struct {
 
 type ServerRes struct {
 	Message string      `json:"message"`
-	Data    interface{} `json:"bottom"`
+	Data    interface{} `json:"data"`
 }
 
 // DataSource 数据源信息

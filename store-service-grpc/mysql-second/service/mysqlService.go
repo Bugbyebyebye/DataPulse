@@ -19,7 +19,7 @@ type ClientReq struct {
 
 type ServerRes struct {
 	Message string      `json:"message"`
-	Data    interface{} `json:"bottom"`
+	Data    interface{} `json:"data"`
 }
 
 func (MysqlSecondService) GetMysqlSecondData(ctx context.Context, req *mysql.MysqlSecondReq) (res *mysql.MysqlSecondRes, err error) {
