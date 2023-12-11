@@ -47,7 +47,7 @@ func GetUserByEmail(email string) (User, error) {
 // GetUserList 获取用户列表
 func GetUserList() ([]User, error) {
 	var userList []User
-	err := dao.Db.Where("state = ?", 1).Find(&userList).Error
+	err := dao.Db.Find(&userList).Error
 	if err != nil {
 		return nil, err
 	}
@@ -101,10 +101,10 @@ func SetUserAuthority(userId int, authority int) error {
 }
 
 // DeleteUser 逻辑删除用户记录
-func DeleteUser(userId int) error {
+func DeleteUser(userId int, state int) error {
 	var user User
 	err := dao.Db.Model(&user).Where("user_id = ?", userId).Updates(map[string]interface{}{
-		"State":      0,
+		"State":      state,
 		"UpdateTime": util.GetUnixTime(),
 	}).Error
 	return err
