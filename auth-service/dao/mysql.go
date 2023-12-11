@@ -18,11 +18,9 @@ func init() {
 	if err != nil {
 		log.Printf("mysql error: %s", err.Error())
 	}
-
 	if Db.Error != nil {
 		log.Printf("datebase error: %s", Db.Error)
 	}
-
 	Db.DB().SetMaxIdleConns(10)
 	Db.DB().SetMaxOpenConns(100)
 	Db.DB().SetConnMaxLifetime(time.Hour)
