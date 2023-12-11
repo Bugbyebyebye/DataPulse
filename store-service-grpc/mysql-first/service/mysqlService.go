@@ -47,6 +47,7 @@ func (MysqlFirstService) GetMysqlFirstData(ctx context.Context, req *mysql.Mysql
 			}
 		}
 	}
+
 	//统一返回
 	sr := ServerRes{Message: "你好，我是 mysql1 grpc服务", Data: result}
 	data, err := json.Marshal(sr)

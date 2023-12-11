@@ -26,22 +26,17 @@ func (*StoreHandle) GetDatabaseColumnNameList(ctx *gin.Context) {
 	if err != nil {
 		log.Printf("mysql1 client err => %s", err)
 	}
-	err = json.Unmarshal(clientRes.Data, &clientData)
-	if err != nil {
-		log.Printf("err => %s", err)
-	}
+	json.Unmarshal(clientRes.Data, &clientData)
 	dataFrom.FromName = "mysql1"
 	dataFrom.Databases = clientData.Data
+	log.Printf("clientData.Data => %+v", clientData.Data)
 	dataFromList = append(dataFromList, dataFrom)
 
 	clientRes2, err := client.MysqlSecondClient.GetMysqlSecondData(ctx, &mysql2.MysqlSecondReq{Param: param})
 	if err != nil {
 		log.Printf("mysql2 client err => %s", err)
 	}
-	err = json.Unmarshal(clientRes2.Data, &clientData)
-	if err != nil {
-		log.Printf("err => %s", err)
-	}
+	json.Unmarshal(clientRes2.Data, &clientData)
 	dataFrom.FromName = "mysql2"
 	dataFrom.Databases = clientData.Data
 	dataFromList = append(dataFromList, dataFrom)
