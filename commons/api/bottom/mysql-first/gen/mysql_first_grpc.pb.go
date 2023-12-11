@@ -74,7 +74,7 @@ type MysqlFirstRes struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Data []byte `protobuf:"bytes,1,opt,name=bottom,proto3" json:"bottom,omitempty"`
 }
 
 func (x *MysqlFirstRes) Reset() {

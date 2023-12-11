@@ -1,25 +1,14 @@
-package handle
+package mysql_first_service
 
-import "commons/result"
-
-type StoreHandle struct{}
-
-func New() *StoreHandle {
-	return &StoreHandle{}
-}
-
-// res 引入统一返回值
-var res result.Result
-
-// Req Res GRPC统一响应
-type Req struct {
+type ClientReq struct {
 	Message string      `json:"message"`
 	Target  string      `json:"target"`
 	Param   interface{} `json:"param"`
 }
-type Res struct {
+
+type ServerRes struct {
 	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"bottom"`
 }
 
 // DataSource 数据源信息

@@ -7,4 +7,4 @@ grpc:
 etcd:
   Name: "etcd"
   Addrs:
-    - "8.130.84.188:2379"
+    - "localhost:2379"

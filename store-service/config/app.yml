@@ -6,7 +6,7 @@ server:
 etcd:
   Name: "etcd"
   Addrs:
-    - "8.130.84.188:2379"
+    - "localhost:2379"
 # 数据库配置
 mysql:
   Host: "222.186.50.126:20134"
