@@ -89,9 +89,11 @@ func (*AuthHandler) SetUserAuthority(ctx *gin.Context) {
 // DeleteUser 删除用户
 func (*AuthHandler) DeleteUser(ctx *gin.Context) {
 	idStr := ctx.PostForm("id")
+	stateStr := ctx.PostForm("state")
 	id, _ := strconv.Atoi(idStr)
+	state, _ := strconv.Atoi(stateStr)
 
-	err := model.DeleteUser(id)
+	err := model.DeleteUser(id, state)
 	if err != nil {
 		ctx.JSON(http.StatusOK, res.Fail(4001, "删除错误"))
 		return
