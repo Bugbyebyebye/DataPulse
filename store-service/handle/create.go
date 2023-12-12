@@ -1,20 +1,15 @@
 package handle
 
 import (
-	mysql1 "commons/api/bottom/mysql-first/gen"
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"store-service/client"
 	"store-service/dao"
 	"store-service/model"
 )
 
 // CreateTable 创建数据仓库数据表
 func (*StoreHandle) CreateTable(ctx *gin.Context) {
-	var clientData Res
-	var data []Res
 	id := ctx.GetInt("id")
 
 	var jsonParam DataSource
@@ -23,8 +18,8 @@ func (*StoreHandle) CreateTable(ctx *gin.Context) {
 	columns := jsonParam.DatabaseList[0].TableList[0].ColumnList
 
 	//log.Printf("param %+v", columns)
-	req := Req{Target: "getColumnData", Param: jsonParam.DatabaseList}
-	param, _ := json.Marshal(req)
+	//req := Req{Target: "getColumnData", Param: jsonParam.DatabaseList}
+	//param, _ := json.Marshal(req)
 
 	//
 	////TODO 检查是否有重名表
@@ -45,34 +40,28 @@ func (*StoreHandle) CreateTable(ctx *gin.Context) {
 		log.Printf("err => %s", err)
 	}
 
-	clientRes, err := client.MysqlFirstClient.GetMysqlFirstData(ctx, &mysql1.MysqlFirstReq{Param: param})
-	if err != nil {
-		log.Printf("mysql1 client err => %s", err)
-	}
-	json.Unmarshal(clientRes.Data, &clientData)
-
 	//data = append(data, clientData.Data)
 	insertSql := CreateInsertSql(tableName, columns)
 	log.Printf("insertSql => %s", insertSql)
-	for _, value := range clientData.Data.([]interface{}) {
-		valueMap, ok := value.(map[string]interface{})
-		if !ok {
-			continue
-		}
-		values := make([]interface{}, 0, len(valueMap))
-		for _, val := range valueMap {
-			values = append(values, val)
-		}
-		log.Printf("values => %+v", values)
-		err := dao.Warehouse.Exec(insertSql, values...).Error
-		if err != nil {
-			log.Printf("err => %s", err)
-		}
-	}
+	//for _, value := range clientData.Data.([]interface{}) {
+	//	valueMap, ok := value.(map[string]interface{})
+	//	if !ok {
+	//		continue
+	//	}
+	//	values := make([]interface{}, 0, len(valueMap))
+	//	for _, val := range valueMap {
+	//		values = append(values, val)
+	//	}
+	//	log.Printf("values => %+v", values)
+	//	err := dao.Warehouse.Exec(insertSql, values...).Error
+	//	if err != nil {
+	//		log.Printf("err => %s", err)
+	//	}
+	//}
 
 	//log.Printf("bottom => %+v", data)
 	//log.Printf("DatabaseList %+v", param.DatabaseList[0].TableList[0].ColumnList)
-	ctx.JSON(http.StatusOK, res.Success(data))
+	//ctx.JSON(http.StatusOK, res.Success(data))
 }
 
 // AlertTable 向数据仓库数据表中追加字段

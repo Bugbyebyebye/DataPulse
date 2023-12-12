@@ -44,11 +44,9 @@
 * auth-service :8081
     * grpc 鉴权服务 :9000
 * log-service :8082
-    * grpc 日志统计服务 :9001
 * store-service :8083
-    * grpc 数据读取存储服务
-    * mysql1 grpc :9002
-    * mysql2 grpc :9003
-  * mongo grpc :9004
+* store-service-grpc 数据读取存储服务
+    * mysql1 gin :8085
+    * mysql2 gin :8086
+    * mongo gin :8087
 * task-service :8084
-    * grpc 服务暂定 :9005

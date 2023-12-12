@@ -1,8 +1,6 @@
 package handle
 
-import (
-	"commons/result"
-)
+import "commons/result"
 
 type StoreHandle struct {
 }

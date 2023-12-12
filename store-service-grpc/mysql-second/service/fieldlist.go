@@ -1,24 +1,9 @@
-package dao
+package service
 
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 )
-
-// TableInfo 数据表属性
-type TableInfo struct {
-	Field   string `gorm:"column:Field"`
-	Type    string `gorm:"column:Type"`
-	Null    string `gorm:"column:Null"`
-	Key     string `gorm:"column:Key"`
-	Default string `gorm:"column:Default"`
-	Extra   string `gorm:"column:Extra"`
-}
-
-type Table struct {
-	TableName  string   `json:"table_name"`
-	ColumnList []string `json:"column_list"`
-}
 
 func GetColumnNameList(db *gorm.DB) []Table {
 	var tableList []Table
