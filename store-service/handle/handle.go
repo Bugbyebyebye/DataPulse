@@ -2,7 +2,8 @@ package handle
 
 import "commons/result"
 
-type StoreHandle struct{}
+type StoreHandle struct {
+}
 
 func New() *StoreHandle {
 	return &StoreHandle{}
@@ -13,13 +14,11 @@ var res result.Result
 
 // Req Res GRPC统一响应
 type Req struct {
-	Message string      `json:"message"`
-	Target  string      `json:"target"`
-	Param   interface{} `json:"param"`
+	Target string      `json:"target"`
+	Param  interface{} `json:"param"`
 }
 type Res struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Data interface{} `json:"data"`
 }
 
 // DataSource 数据源信息

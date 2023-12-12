@@ -11,7 +11,7 @@ import (
 
 // GetDatabaseColumnNameList 获取数据库字段列表
 func (*StoreHandle) GetDatabaseColumnNameList(ctx *gin.Context) {
-	req := Req{Message: "获取数据库字段列表", Target: "databaseList"}
+	req := Req{Target: "databaseList"}
 	param, err := json.Marshal(req)
 	if err != nil {
 		log.Printf("err => %s", err)
