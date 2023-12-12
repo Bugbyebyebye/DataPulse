@@ -1,8 +1,14 @@
 package main
 
-import "mysql-second/config/register"
+import (
+	"commons/config"
+	"commons/config/app"
+	"github.com/gin-gonic/gin"
+	"mysql-second/router"
+)
 
 func main() {
-	register.EtcdServerRegister()
-	register.GrpcRegister()
+	r := gin.Default()
+	router.InitRouter(r)
+	app.Run(r, config.Conf.SC.Name, config.Conf.SC.Addr, nil)
 }

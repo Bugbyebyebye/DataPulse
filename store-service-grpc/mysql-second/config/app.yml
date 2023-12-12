@@ -1,10 +1,4 @@
-grpc:
-  Name: "mysql2"
-  addr: "localhost:9003"
-  Version: "1.0"
-  Weight: 1
-
-etcd:
-  Name: "etcd"
-  Addrs:
-    - "localhost:2379"
+# Gin web服务配置
+server:
+  Name: "mysql-second"
+  Addr: "localhost:8086"

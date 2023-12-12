@@ -12,15 +12,6 @@ func New() *StoreHandle {
 // res 引入统一返回值
 var res result.Result
 
-// Req Res GRPC统一响应
-type Req struct {
-	Target string      `json:"target"`
-	Param  interface{} `json:"param"`
-}
-type Res struct {
-	Data interface{} `json:"data"`
-}
-
 // DataSource 数据源信息
 type DataSource struct {
 	SaveName     string      `json:"save_name,omitempty"`

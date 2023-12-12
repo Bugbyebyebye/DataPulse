@@ -1,8 +1,14 @@
 package main
 
-import "mongodb-first/config/register"
+import (
+	"commons/config"
+	"commons/config/app"
+	"github.com/gin-gonic/gin"
+	"mongodb-first/router"
+)
 
 func main() {
-	register.EtcdServerRegister()
-	register.GrpcRegister()
+	r := gin.Default()
+	router.InitRouter(r)
+	app.Run(r, config.Conf.SC.Name, config.Conf.SC.Addr, nil)
 }
