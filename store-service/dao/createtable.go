@@ -4,12 +4,9 @@ import "fmt"
 
 func CreateTableBySQL(tableName string, columns []string) {
 	var createTableSQL string
-	for i, column := range columns {
-		if i == 0 {
-			createTableSQL = fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s INT AUTO_INCREMENT PRIMARY KEY", tableName, column)
-		} else {
-			createTableSQL += fmt.Sprintf(", %s VARCHAR(255) NOT NULL", column)
-		}
+	createTableSQL = fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s INT AUTO_INCREMENT PRIMARY KEY", tableName, "id")
+	for _, column := range columns {
+		createTableSQL += fmt.Sprintf(", %s VARCHAR(255) NOT NULL", column)
 	}
 
 	createTableSQL += ");"

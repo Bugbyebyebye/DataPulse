@@ -1,14 +1,12 @@
 package mysql_first_service
 
 type ClientReq struct {
-	Message string      `json:"message"`
-	Target  string      `json:"target"`
-	Param   interface{} `json:"param"`
+	Target string      `json:"target"`
+	Param  interface{} `json:"param"`
 }
 
 type ServerRes struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Data interface{} `json:"data"`
 }
 
 // DataSource 数据源信息

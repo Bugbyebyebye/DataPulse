@@ -12,11 +12,9 @@ type MongoFirstService struct {
 }
 
 type ClientReq struct {
-	Message string `json:"message"`
 }
 
 type ServerRes struct {
-	Message string `json:"message"`
 }
 
 func (MongoFirstService) GetMongoDbFirstData(ctx context.Context, req *mongo.MongoFirstReq) (res *mongo.MongoFirstRes, err error) {
@@ -24,7 +22,7 @@ func (MongoFirstService) GetMongoDbFirstData(ctx context.Context, req *mongo.Mon
 	err = json.Unmarshal(req.Param, &cq)
 	log.Printf("来自客户端的请求信息为 =>  %+v", cq)
 
-	sr := ServerRes{Message: "你好，我是 mongo1 grpc服务"}
+	sr := ServerRes{}
 	data, err := json.Marshal(sr)
 	if err != nil {
 		log.Printf("err => %s", err)
