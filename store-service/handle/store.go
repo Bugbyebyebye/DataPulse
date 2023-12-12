@@ -12,7 +12,7 @@ import (
 
 // GetMysqlFirstData 获取Mysql1的数据
 func (*StoreHandle) GetMysqlFirstData(ctx *gin.Context) {
-	req := Req{Message: "这是服务端，mysql1你好", Target: "databaseList"}
+	req := Req{Target: "databaseList"}
 	param, err := json.Marshal(req)
 	if err != nil {
 		log.Printf("err => %s", err)
@@ -36,7 +36,7 @@ func (*StoreHandle) GetMysqlFirstData(ctx *gin.Context) {
 }
 
 func (*StoreHandle) GetMysqlSecondData(ctx *gin.Context) {
-	req := Req{Message: "这是服务端，mysql2你好"}
+	req := Req{}
 	param, err := json.Marshal(req)
 	if err != nil {
 		log.Printf("err => %s", err)
@@ -56,7 +56,7 @@ func (*StoreHandle) GetMysqlSecondData(ctx *gin.Context) {
 }
 
 func (*StoreHandle) GetMongoDbFirstData(ctx *gin.Context) {
-	req := Req{Message: "这是服务端，Mongo1你好"}
+	req := Req{}
 	param, err := json.Marshal(req)
 	if err != nil {
 		log.Printf("err => %s", err)

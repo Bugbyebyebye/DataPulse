@@ -13,13 +13,11 @@ type MysqlSecondService struct {
 }
 
 type ClientReq struct {
-	Message string `json:"message"`
-	Target  string `json:"target"`
+	Target string `json:"target"`
 }
 
 type ServerRes struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Data interface{} `json:"data"`
 }
 
 func (MysqlSecondService) GetMysqlSecondData(ctx context.Context, req *mysql.MysqlSecondReq) (res *mysql.MysqlSecondRes, err error) {
@@ -37,7 +35,7 @@ func (MysqlSecondService) GetMysqlSecondData(ctx context.Context, req *mysql.Mys
 		//log.Printf("list1 => %+v", result)
 	}
 
-	sr := ServerRes{Message: "你好，我是 mysql2 grpc服务", Data: result}
+	sr := ServerRes{Data: result}
 	data, err := json.Marshal(sr)
 	if err != nil {
 		log.Printf("err => %s", err)
