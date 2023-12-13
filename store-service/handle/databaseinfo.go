@@ -14,14 +14,14 @@ func (*StoreHandle) GetDatabaseColumnNameList(ctx *gin.Context) {
 	var dataFrom DataSource
 
 	var first []Database
-	err := requests.URL("http://localhost:8085").
+	err := requests.URL("http://mysql-first:8085").
 		Path("/getInfo").
 		ToJSON(&first).Fetch(ctx)
 	if err != nil {
 		log.Printf("err => %+v", err)
 	}
 	var second []Database
-	err = requests.URL("http://localhost:8086").
+	err = requests.URL("http://mysql-second:8086").
 		Path("/getInfo").
 		ToJSON(&second).Fetch(ctx)
 	if err != nil {
