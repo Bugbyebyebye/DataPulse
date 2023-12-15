@@ -87,6 +87,7 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 		userName, ok := req["user_name"].(string)
 		TaskName, ok := req["task_name"].(string)
 		Status, ok := req["status"].(string)
+		Takingtime, ok := req["taking_time"].(string)
 		if ok {
 			fmt.Println("断言成功")
 		} else {
@@ -95,7 +96,7 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 			ctx.JSON(200, res.Fail(400, "断言失败"))
 			return
 		}
-		err := model.RecordUserTackLog(userName, TaskName, Status)
+		err := model.RecordUserTackLog(userName, TaskName, Status, Takingtime)
 		if err != nil {
 			fmt.Printf("将日志数据插入到数据库失败: %s\n", err.Error())
 			ctx.JSON(200, res.Fail(4001, "将日志数据插入到数据库失败"))
@@ -106,7 +107,6 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 		//userName, ok := req["user_name"].(string)
 		ApiUrl, ok := req["api_url"].(string)
 		Invokeip, ok := req["invoke_ip"].(string)
-		Takingtime, ok := req["taking_time"].(string)
 		Invokelog, ok := req["invoke_log"].(string)
 		//json解析的数据是float64,需要二次转换
 		Status, ok := req["status"].(string)
@@ -119,7 +119,7 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 			ctx.JSON(200, res.Fail(400, "断言失败"))
 			return
 		}
-		err := model.RecordUserInvokeLog(ApiUrl, User, Invokeip, Takingtime, Invokelog, Status)
+		err := model.RecordUserInvokeLog(ApiUrl, User, Invokeip, Invokelog, Status)
 		if err != nil {
 			fmt.Printf("将日志数据插入到数据库失败: %s\n", err.Error())
 			ctx.JSON(200, res.Fail(4001, "将日志数据插入到数据库失败"))
