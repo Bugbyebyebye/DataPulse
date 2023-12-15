@@ -3,21 +3,27 @@ package config
 //配置 读取yml配置文件
 
 import (
+	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"log"
 	"os"
 )
 
-var Conf = InitConfig()
+var (
+	Conf    = InitConfig()
+	EnvConf = InitEnvConfig()
+)
 
 type Config struct {
-	viper *viper.Viper
-	SC    *ServerConfig
-	RC    *RedisConfig
-	MC    *MysqlConfig
-	GRPC  *GrpcConfig
-	ETCD  *EtcdConfig
-	SMTP  *SmtpConfig
+	viper   *viper.Viper
+	SC      *ServerConfig
+	RC      *RedisConfig
+	MC      *MysqlConfig
+	GRPC    *GrpcConfig
+	ETCD    *EtcdConfig
+	SMTP    *SmtpConfig
+	WEBHOOK *SendWebHook
 }
 
 // ServerConfig 服务器配置
@@ -61,9 +67,15 @@ type EtcdConfig struct {
 	Addrs []string
 }
 
+// SendWebHook SendWebHookUrl SendWebHook 发送日志通知
+type SendWebHook struct {
+	SendUrl string
+}
+
 // InitConfig 获取yml配置初始化
 func InitConfig() *Config {
 	c := &Config{viper: viper.New()}
+	InitEnvConfig()
 	workDir, _ := os.Getwd()
 	c.viper.SetConfigName("app")
 	c.viper.SetConfigType("yml")
@@ -75,6 +87,19 @@ func InitConfig() *Config {
 	}
 	c.ReaderServerConfig()
 	return c
+}
+
+// InitEnvConfig 初始化Env
+func InitEnvConfig() *Config {
+	cs := &Config{}
+
+	// 尝试从 .env 文件加载环境变量
+	if err := godotenv.Load(); err != nil {
+		fmt.Println("No .env file found, loading environment variables directly.")
+	}
+
+	cs.ReaderServerConfigEnv()
+	return cs
 }
 
 // ReaderServerConfig 读取配置方法
@@ -120,4 +145,14 @@ func (c *Config) ReaderServerConfig() {
 	sm.Password = c.viper.GetString("smtp.Password")
 	sm.Fromname = c.viper.GetString("smtp.Fromname")
 	c.SMTP = sm
+}
+func (c *Config) ReaderServerConfigEnv() {
+	c.WEBHOOK = &SendWebHook{
+		SendUrl: os.Getenv("SendUrl"),
+	}
+	c.MC = &MysqlConfig{
+		Host:     os.Getenv("mysqlHost"),
+		Name:     os.Getenv("mysqlName"),
+		Password: os.Getenv("mysqlPassword"),
+	}
 }
