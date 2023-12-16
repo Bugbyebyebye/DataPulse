@@ -87,14 +87,14 @@ func RunDocker(portStr, namestr string) (error error, serverurl string) {
 	setEnv("MYSQL_PASSWORD", "maojiukeai1412")
 	setEnv("PORT", portStr)
 	// 构建 Docker 命令
-	cmd := exec.Command("docker", "run",
+	cmd := exec.Command("podman", "run",
 		"--env", fmt.Sprintf("MYSQL_HOST=%s", "222.186.50.126:20010"),
 		"--env", fmt.Sprintf("MYSQL_NAME=%s", "root"),
 		"--env", fmt.Sprintf("USERNAME=%s", "sora"),
 		"--env", fmt.Sprintf("MYSQL_PASSWORD=%s", "maojiukeai1412"),
-		"--network", "datapulse_default",
-		"--label", fmt.Sprintf("traefik.enable=true'"),
-		"--label", fmt.Sprintf("traefik.http.routers.%s.rule=Host(`%s.emotionalbug.top`)", namestr, namestr),
+		//"--network", "datapulse_default",
+		"--label", fmt.Sprintf("traefik.enable=true"),
+		"--label", fmt.Sprintf("traefik.http.routers.%s.rule=Host(\\\"%s.emotionalbug.top\\\")", namestr, namestr),
 		"--label", fmt.Sprintf("traefik.http.routers.%s.service=%s", namestr, namestr),
 		"--label", fmt.Sprintf("traefik.http.routers.%s.entrypoints=https", namestr),
 		"--label", fmt.Sprintf("traefik.http.services.%s.loadbalancer.server.port=8080", namestr),
