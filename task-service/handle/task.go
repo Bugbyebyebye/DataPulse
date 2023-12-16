@@ -60,7 +60,7 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 	case response := <-tunnel:
 		ctx.JSON(200, res.Fail(400, response))
 	case <-time.After(5 * time.Second): // 等待5秒
-		ctx.JSON(200, res.Success("生成api的链接为:"+namestr+"emotionalbug.top"))
+		ctx.JSON(200, res.Success("生成api的链接为:"+namestr+".emotionalbug.top"))
 	}
 }
 
