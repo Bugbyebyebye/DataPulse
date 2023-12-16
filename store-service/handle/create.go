@@ -1,103 +1,129 @@
 package handle
 
 import (
+	"commons/util"
+	"fmt"
+	"github.com/carlmjohnson/requests"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"store-service/common"
+	"store-service/config"
 	"store-service/dao"
 	"store-service/model"
 )
 
-// CreateTable 创建数据仓库数据表
-func (*StoreHandle) CreateTable(ctx *gin.Context) {
+//创建数据表 追加字段
+
+// CreateTheTable 创建数据仓库数据表
+func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
+	//从token获取用户id
 	id := ctx.GetInt("id")
 
-	var jsonParam DataSource
+	var jsonParam common.DataSource
 	ctx.BindJSON(&jsonParam)
-	tableName := jsonParam.SaveName
-	columns := jsonParam.DatabaseList[0].TableList[0].ColumnList
+	databaseName := jsonParam.TargetDatabase                     //目标数据库名
+	tableName := jsonParam.TargetTable                           //目标表名
+	tableType := jsonParam.TargetType                            //目标表类型
+	sourceName := jsonParam.FromName                             //数据源名
+	databaseList := jsonParam.DatabaseList[0]                    //数据表列表 1
+	columns := jsonParam.DatabaseList[0].TableList[0].ColumnList //数据表1字段列表
 
-	//log.Printf("param %+v", columns)
-	//req := Req{Target: "getColumnData", Param: jsonParam.DatabaseList}
-	//param, _ := json.Marshal(req)
+	//TODO 应该针对多个数据表的字段进行创表和插入数据
+	db := config.GetDbByDatabaseName(databaseName)
+	log.Printf("db => %+v", db)
 
-	//
-	////TODO 检查是否有重名表
-	//table := dao.Warehouse.HasTable(jsonParam.SaveName)
-	//if table {
-	//	ctx.JSON(http.StatusOK, res.Fail(4001, "表名已经存在"))
-	//}
+	//检查是否有重名表
+	tableNameExist := dao.GetAllTableName(db)
+	if util.In(tableName, tableNameExist) {
+		ctx.JSON(http.StatusOK, res.Fail(4001, "表名已存在，请重新选择"))
+		return
+	}
 
 	//创建新数据库
-	dao.CreateTableBySQL(jsonParam.SaveName, columns)
+	dao.CreateTableBySQL(db, tableName, columns)
 	//创建用户数据库关联
-	tableId, err := model.InitTable(jsonParam.SaveName, len(columns))
+	tableId, err := model.InitTable(tableName, databaseName, tableType, len(columns))
 	if err != nil {
 		log.Printf("err => %s", err)
 	}
+	//初始化数据表和用户关联
 	err = model.InitTableUser(tableId, id)
 	if err != nil {
 		log.Printf("err => %s", err)
 	}
+	log.Printf("tableList => %+v", databaseList)
 
-	//data = append(data, clientData.Data)
-	insertSql := CreateInsertSql(tableName, columns)
-	log.Printf("insertSql => %s", insertSql)
-	//for _, value := range clientData.Data.([]interface{}) {
-	//	valueMap, ok := value.(map[string]interface{})
-	//	if !ok {
-	//		continue
-	//	}
-	//	values := make([]interface{}, 0, len(valueMap))
-	//	for _, val := range valueMap {
-	//		values = append(values, val)
-	//	}
-	//	log.Printf("values => %+v", values)
-	//	err := dao.Warehouse.Exec(insertSql, values...).Error
-	//	if err != nil {
-	//		log.Printf("err => %s", err)
-	//	}
-	//}
+	//根据数据源选择底层数据来源
+	var bottomData []map[string]interface{}
+	if sourceName == "mysql1" {
+		err := requests.URL("http://localhost:8085").
+			Path("/getColumnData").
+			BodyJSON(&databaseList).
+			ToJSON(&bottomData).
+			Fetch(ctx)
+		//log.Printf("bottomData => %+v", bottomData)
+		if err != nil {
+			log.Printf("err => %s", err)
+		}
+	} else if sourceName == "mysql2" {
+		err := requests.URL("http://localhost:8086").
+			Path("/getColumnData").
+			BodyJSON(&databaseList).
+			ToJSON(&bottomData).
+			Fetch(ctx)
+		//log.Printf("bottomData => %+v", bottomData)
+		if err != nil {
+			log.Printf("err => %s", err)
+		}
+	}
+	//根据底层数据 新增数据
+	dao.InitTableData(db, tableName, bottomData)
 
-	//log.Printf("bottom => %+v", data)
-	//log.Printf("DatabaseList %+v", param.DatabaseList[0].TableList[0].ColumnList)
-	//ctx.JSON(http.StatusOK, res.Success(data))
+	fmt.Println("Data inserted successfully.")
+	ctx.JSON(http.StatusOK, res.Success(bottomData))
 }
 
 // AlertTable 向数据仓库数据表中追加字段
 func (*StoreHandle) AlertTable(ctx *gin.Context) {
-	var jsonParam DataSource
+	var jsonParam common.DataSource
 	ctx.BindJSON(&jsonParam)
 
-	log.Printf("jsonParam %+v", jsonParam)
-	println(jsonParam.SaveName)
-	println(jsonParam.FromName)
+	databaseName := jsonParam.TargetDatabase
+	tableName := jsonParam.TargetTable                           //表明
+	sourceName := jsonParam.FromName                             //数据源名
+	databaseList := jsonParam.DatabaseList[0]                    //数据表列表 1
+	columns := jsonParam.DatabaseList[0].TableList[0].ColumnList //数据表1字段列表
+	//TODO 应该针对多个数据表的字段进行创表和插入数据
 
-	columns := jsonParam.DatabaseList[0].TableList[0].ColumnList
+	//匹配目标数据库
+	db := config.GetDbByDatabaseName(databaseName)
+	//向数据表中追加新增字段
+	dao.AlertTableBySQL(db, tableName, columns)
 
-	dao.AlertTableBySQL(jsonParam.SaveName, columns)
-
-	ctx.JSON(http.StatusOK, res.Success(200))
-}
-
-// CreateInsertSql 根据表名和字段列表生成动态插入的sql语句
-func CreateInsertSql(tableName string, fields []string) string {
-	var insertSql string
-	for i, v := range fields {
-		if i == 0 {
-			insertSql = "insert into " + tableName + "(" + v
-		} else {
-			insertSql += "," + v
+	var bottomData []map[string]interface{}
+	//根据数据源选择底层数据来源
+	if sourceName == "mysql1" {
+		err := requests.URL("http://localhost:8085").
+			Path("/getColumnData").
+			BodyJSON(&databaseList).
+			ToJSON(&bottomData).
+			Fetch(ctx)
+		log.Printf("bottomData => %+v", bottomData)
+		if err != nil {
+			log.Printf("err => %s", err)
+		}
+	} else if sourceName == "mysql2" {
+		err := requests.URL("http://localhost:8086").
+			Path("/getColumnData").
+			BodyJSON(&databaseList).
+			ToJSON(&bottomData).
+			Fetch(ctx)
+		log.Printf("bottomData => %+v", bottomData)
+		if err != nil {
+			log.Printf("err => %s", err)
 		}
 	}
-	insertSql += ")"
-	for i, _ := range fields {
-		if i == 0 {
-			insertSql += " values(?"
-		} else {
-			insertSql += ",?"
-		}
-	}
-	insertSql += ");"
-	return insertSql
+	dao.UpdateTableData(db, tableName, bottomData)
+	ctx.JSON(http.StatusOK, res.Success(bottomData))
 }

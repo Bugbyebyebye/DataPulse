@@ -14,5 +14,5 @@ func (*TaskRouter) Route(r *gin.Engine) {
 	r.GET("/default", task.Default)
 	r.GET("/create", task.CreateApi)
 	//用户自定义api接口 路径
-	r.POST("/task/api/*", task.CreateApi)
+	r.POST("/api/*path", task.ApiData)
 }

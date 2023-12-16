@@ -3,6 +3,7 @@ package handle
 import (
 	"commons/result"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -16,4 +17,12 @@ func (*TaskHandle) Default(ctx *gin.Context) {
 func (*TaskHandle) CreateApi(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, res.Success("服务生成成功！"))
+}
+
+func (*TaskHandle) ApiData(ctx *gin.Context) {
+	url := ctx.Request.URL
+	log.Printf("url => %s", url)
+	param := ctx.Param("path")
+	log.Printf("param => %s", param)
+	ctx.JSON(http.StatusOK, res.Success(url))
 }

@@ -1,11 +1,13 @@
-package service
+package common
 
 // DataSource 数据源信息
 type DataSource struct {
-	SaveName     string      `json:"save_name,omitempty"`
-	FromName     string      `json:"source_name"`
-	DatabaseList []Database  `json:"database_list,omitempty"`
-	Databases    interface{} `json:"databases,omitempty"`
+	TargetDatabase string      `json:"target_database,omitempty"`
+	TargetTable    string      `json:"target_table,omitempty"`
+	TargetType     int         `json:"target_type,omitempty"`
+	FromName       string      `json:"source_name"`
+	DatabaseList   []Database  `json:"database_list,omitempty"`
+	Databases      interface{} `json:"databases,omitempty"`
 }
 
 type Database struct {

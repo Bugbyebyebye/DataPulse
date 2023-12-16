@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func GetColumnNameList(db *gorm.DB) []Table {
