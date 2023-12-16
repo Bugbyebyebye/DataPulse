@@ -2,7 +2,8 @@ package model
 
 import (
 	"commons/util"
-	"store-service/dao"
+	"log"
+	"store-service/config"
 )
 
 type TableUserRelate struct {
@@ -26,6 +27,22 @@ func InitTableUser(tableId int, userId int) error {
 		CreateTime: util.GetUnixTime(),
 		UpdateTime: 0,
 	}
-	err := dao.System.Select("table_id", "user_id", "state", "create_time").Create(&t).Error
+	err := config.System.Select("table_id", "user_id", "state", "create_time").Create(&t).Error
 	return err
+}
+
+//func Update(tableName string) error {
+//	var dur DatabaseUserRelate
+//	dao.Warehouse.Model(&dur).Where("table_name = ?", tableName).Updates(map[string]interface{}{
+//		"UpdateTime": util.GetUnixTime(),
+//	})
+//}
+
+// GetTableIdList 根据用户id 获取用户数据表id列表
+func GetTableIdList(userId int) ([]int, error) {
+	log.Printf("userId => %v", userId)
+	var result []int
+	var tur TableUserRelate
+	err := config.System.Model(&tur).Where("user_id = ?", userId).Select("table_id").Find(&result).Error
+	return result, err
 }

@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -29,12 +30,15 @@ var admits = map[string]string{
 }
 
 type Info struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
+	Id        int    `json:"id"`
+	Username  string `json:"username"`
+	Role      string `json:"role"`
+	Authority int    `json:"authority"`
 }
 
 func ProxyHandler(ctx *gin.Context) {
 	r := &result.Result{}
+	var info Info
 	//根据路径匹配路由
 	split := strings.Split(ctx.Request.URL.String(), "/")
 	proxyUrl, _ := url.Parse("http://" + hosts[split[1]])
@@ -58,16 +62,17 @@ func ProxyHandler(ctx *gin.Context) {
 		}
 		//鉴权成功
 		//log.Printf("res => %s", res)
-		v := Info{}
-		err = json.Unmarshal(res.Info, &v)
+		err = json.Unmarshal(res.Info, &info)
 		if err != nil {
 			ctx.JSON(http.StatusOK, r.Fail(400, "用户JSON数据解析错误！"))
 			return
 		}
 
-		log.Printf("用户 Id:%v Username:%s 登录数据中台", v.Id, v.Username)
-		ctx.Set("id", v.Id)
-		ctx.Set("username", v.Username)
+		log.Printf("用户 Id:%v Username:%s 访问数据中台", info.Id, info.Username)
+		ctx.Request.Header.Set("id", strconv.Itoa(info.Id))
+		ctx.Request.Header.Set("username", info.Username)
+		ctx.Request.Header.Set("role", info.Role)
+		ctx.Request.Header.Set("authority", strconv.Itoa(info.Authority))
 		//ctx.JSON(200, "成功")
 	}
 

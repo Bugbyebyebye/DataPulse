@@ -1,10 +1,9 @@
 package dao
 
 import (
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
-	"time"
 )
 
 var (
@@ -15,26 +14,30 @@ var (
 
 func init() {
 	//教育数据库
-	Education, err = gorm.Open("mysql", "root:maojiukeai1412@tcp(222.186.50.126:20010)/df_education?charset=utf8mb4&parseTime=True&loc=Local")
+	Education, err = gorm.Open(mysql.Open("root:maojiukeai1412@tcp(222.186.50.126:20010)/df_education?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
 	if err != nil {
 		log.Printf("mysql error => %s", err)
 	}
 	if Education.Error != nil {
 		log.Printf("Education error => %s", Education.Error)
 	}
-	Education.DB().SetMaxIdleConns(10)
-	Education.DB().SetMaxOpenConns(100)
-	Education.DB().SetConnMaxLifetime(time.Hour)
 
 	//图书馆数据库
-	Library, err = gorm.Open("mysql", "root:maojiukeai1412@tcp(222.186.50.126:20010)/df_library?charset=utf8mb4&parseTime=True&loc=Local")
+	Library, err = gorm.Open(mysql.Open("root:maojiukeai1412@tcp(222.186.50.126:20010)/df_library?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
 	if err != nil {
 		log.Printf("mysql error => %s", err)
 	}
 	if Library.Error != nil {
 		log.Printf("Education error => %s", Library.Error)
 	}
-	Library.DB().SetMaxIdleConns(10)
-	Library.DB().SetMaxOpenConns(100)
-	Library.DB().SetConnMaxLifetime(time.Hour)
+}
+
+// QueryColumnData 传入字段值获取字段数据
+func QueryColumnData(db *gorm.DB, tableName string, columnList []string) []map[string]interface{} {
+	var data []map[string]interface{}
+	err := db.Table(tableName).Select(columnList).Find(&data).Error
+	if err != nil {
+		log.Printf("mysql error => %s", err)
+	}
+	return data
 }
