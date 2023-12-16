@@ -81,18 +81,16 @@ func CreateAPi(portStr string, pathStr string, funcName string) {
 }
 
 func RunDocker(portStr string, funcName string) {
-	// 设置环境变量
-	setEnv("Host", "222.186.50.126")
-	setEnv("Port", "20134")
-	setEnv("Username", "root")
-	setEnv("Password", "maojiukeai1412")
-	setEnv("Database", "df_system")
-	setEnv("ServerPort", portStr)
+	setEnv("MYSQL_HOST", "222.186.50.126:20010")
+	setEnv("USERNAME", "sora")
+	setEnv("MYSQL_NAME", "root")
+	setEnv("MYSQL_PASSWORD", "maojiukeai1412")
+	setEnv("PORT", portStr)
 	portMapping := portStr + ":" + portStr
 
 	// 构建 Docker 命令
-	cmd := exec.Command("podman", "run", "--env", "Port", "--env", "Host", "--env", "Username", "--env", "Password", "--env", "Database", "--env", "ServerPort", "-p", portMapping, "autodocker")
-
+	cmd := exec.Command("docker", "run", "--env", "MYSQL_HOST", "--env", "MYSQL_NAME", "--env", "MYSQL_PASSWORD", "--env", "mysqlPassword", "--env", "USERNAME", "--env", "PORT", "-p", portMapping, "autodocker")
+	fmt.Println(cmd)
 	// 执行 Docker 命令
 	output, err := cmd.CombinedOutput()
 	if err != nil {
