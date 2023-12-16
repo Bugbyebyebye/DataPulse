@@ -4,5 +4,11 @@ WORKDIR /app
 COPY . .
 RUN go env -w GO111MODULE=auto
 RUN go build -o ./task-service/main ./task-service/main.go
+# 安装 Docker
+RUN apt-get update && \
+RUN apt-get install -y curl
+RUN curl -sSL https://get.docker.com -o get-docker.sh
+RUN bash get-docker.sh
+
 WORKDIR /app/task-service
 ENTRYPOINT ["./main"]

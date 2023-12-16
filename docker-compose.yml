@@ -84,6 +84,8 @@ services:
     depends_on:
       - etcd
       - redis
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   store-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/store-service:latest
