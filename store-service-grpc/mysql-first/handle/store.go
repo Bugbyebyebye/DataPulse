@@ -11,20 +11,13 @@ import (
 
 // GetAllColumnNameList 获取mysql1数据库中的所有字段名
 func (*StoreHandle) GetAllColumnNameList(ctx *gin.Context) {
+	var result []common.Table
+	education := service.GetColumnNameList(dao.Education, "df_education")
 
-	var databaseList []common.Database
-	var database common.Database
-	education := service.GetColumnNameList(dao.Education)
-	database.DatabaseName = "df_education"
-	database.TableList = education
-	databaseList = append(databaseList, database)
+	library := service.GetColumnNameList(dao.Library, "df_library")
 
-	library := service.GetColumnNameList(dao.Library)
-	database.DatabaseName = "df_library"
-	database.TableList = library
-	databaseList = append(databaseList, database)
-
-	ctx.JSON(http.StatusOK, databaseList)
+	result = append(education, library...)
+	ctx.JSON(http.StatusOK, result)
 }
 
 type Result struct {
@@ -33,11 +26,14 @@ type Result struct {
 
 // GetColumnData 根据字段名获取数据
 func (*StoreHandle) GetColumnData(ctx *gin.Context) {
-	var database common.Database
+	var table common.Table
 
-	ctx.BindJSON(&database)
-	log.Printf("tableList => %+v", database)
-	list := service.GetDataByColumnList(database.DatabaseName, database.TableList)
+	err := ctx.BindJSON(&table)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	log.Printf("tableList => %+v", table)
+	list := service.GetDataByColumnList(table)
 
 	ctx.JSON(http.StatusOK, list)
 }
