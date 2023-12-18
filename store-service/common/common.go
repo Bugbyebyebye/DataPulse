@@ -1,23 +1,18 @@
 package common
 
-// DataSource 数据源信息
-type DataSource struct {
-	TargetDatabase string      `json:"target_database,omitempty"`
-	TargetTable    string      `json:"target_table,omitempty"`
-	TargetType     int         `json:"target_type,omitempty"`
-	FromName       string      `json:"source_name"`
-	DatabaseList   []Database  `json:"database_list,omitempty"`
-	Databases      interface{} `json:"databases,omitempty"`
-}
-
-type Database struct {
-	DatabaseName string  `json:"database_name"`
-	TableList    []Table `json:"table_list"`
+type CreateReq struct {
+	TargetDatabase string  `json:"target_database"`
+	TargetTable    string  `json:"target_table"`
+	TargetType     int     `json:"target_type"`
+	TableList      []Table `json:"table_list"`
 }
 
 type Table struct {
-	TableName  string   `json:"table_name"`
-	ColumnList []string `json:"column_list"`
+	RelateFlag   string   `json:"relate_flag"`
+	SourceName   string   `json:"source_name"`
+	DatabaseName string   `json:"database_name"`
+	TableName    string   `json:"table_name"`
+	ColumnList   []string `json:"column_list"`
 }
 
 // TableInfo 数据表属性
@@ -28,4 +23,19 @@ type TableInfo struct {
 	Key     string `gorm:"column:Key"`
 	Default string `gorm:"column:Default"`
 	Extra   string `gorm:"column:Extra"`
+}
+
+// GetUniqueColumnList 字段列表去重
+func GetUniqueColumnList(tableList []Table) []string {
+	var columns []string
+	uniqueMap := make(map[string]bool)
+	for _, t := range tableList {
+		for _, v := range t.ColumnList {
+			if _, ok := uniqueMap[v]; !ok {
+				uniqueMap[v] = true
+				columns = append(columns, v)
+			}
+		}
+	}
+	return columns
 }

@@ -21,3 +21,13 @@ func init() {
 		log.Printf("Education error => %s", Department.Error)
 	}
 }
+
+// QueryColumnData 传入字段值获取字段数据
+func QueryColumnData(db *gorm.DB, tableName string, columnList []string) []map[string]interface{} {
+	var data []map[string]interface{}
+	err := db.Table(tableName).Select(columnList).Find(&data).Error
+	if err != nil {
+		log.Printf("mysql error => %s", err)
+	}
+	return data
+}
