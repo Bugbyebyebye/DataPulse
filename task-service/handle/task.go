@@ -64,6 +64,45 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 	}
 }
 
+func (*TaskHandle) RestartDocker(ctx *gin.Context) {
+	name := ctx.Query("port")
+	tunnel := make(chan string)
+
+	go func() {
+		err := api.RestartDocker(name)
+		if err != nil {
+			tunnel <- "服务重启出错，请检查日志"
+		}
+		close(tunnel) // 发送完数据后关闭通道
+	}()
+	select {
+	case response := <-tunnel:
+		ctx.JSON(200, res.Fail(400, response))
+	case <-time.After(5 * time.Second): // 等待5秒
+		ctx.JSON(200, res.Success("服务重启成功"))
+	}
+}
+
+func (*TaskHandle) StopDocker(ctx *gin.Context) {
+	name := ctx.Query("port")
+	tunnel := make(chan string)
+
+	go func() {
+		err := api.StopDocker(name)
+		if err != nil {
+			tunnel <- "服务删除出错，请检查日志"
+		}
+		tunnel <- "服务删除成功"
+		close(tunnel) // 发送完数据后关闭通道
+	}()
+	select {
+	case response := <-tunnel:
+		ctx.JSON(200, res.Success(response))
+	case <-time.After(5 * time.Second): // 等待5秒
+		ctx.JSON(200, res.Success("服务Loop.请尽快联系管理员"))
+	}
+}
+
 func (*TaskHandle) ApiData(ctx *gin.Context) {
 	url := ctx.Request.URL
 	log.Printf("url => %s", url)

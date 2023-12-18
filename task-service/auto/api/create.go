@@ -93,7 +93,7 @@ func RunDocker(portStr, namestr string) (error error, serverurl string) {
 		"--env", fmt.Sprintf("USERNAME=%s", "sora"),
 		"--env", fmt.Sprintf("MYSQL_PASSWORD=%s", "maojiukeai1412"),
 		"--network", "datapulse_default",
-		"--label", fmt.Sprintf("traefik.enable=true'"),
+		"--label", fmt.Sprintf("traefik.enable=true"),
 		"--label", fmt.Sprintf("traefik.http.routers.%s.rule=Host(`%s.emotionalbug.top`)", namestr, namestr),
 		"--label", fmt.Sprintf("traefik.http.routers.%s.service=%s", namestr, namestr),
 		"--label", fmt.Sprintf("traefik.http.routers.%s.entrypoints=https", namestr),
@@ -111,11 +111,43 @@ func RunDocker(portStr, namestr string) (error error, serverurl string) {
 		return err, ""
 	}
 
-	//todo 实现将生成的链接存在数据库中
+	//todo 实现将生成的链接/容器名存在数据库中
 	// 打印命令输出
 	fmt.Println(string(output))
 	serverstr := fmt.Sprintf("%s.emotionalbug.top", namestr)
 	return nil, serverstr
+}
+
+func StopDocker(name string) []byte {
+	// 构建 Docker 命令
+	cmd := exec.Command(
+		"docker", "stop", fmt.Sprintf("%s", name),
+		"&&",
+		"docker", "rm", fmt.Sprintf("%s", name))
+	fmt.Println(cmd)
+
+	// 执行 Docker 命令
+	err, _ := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("删除失败:", err)
+		return err
+	}
+	return nil
+}
+
+func RestartDocker(name string) []byte {
+	// 构建 Docker 命令
+	cmd := exec.Command(
+		"docker", "restart", fmt.Sprintf("%s", name))
+	fmt.Println(cmd)
+
+	// 执行 Docker 命令
+	err, _ := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("重启失败:", err)
+		return err
+	}
+	return nil
 }
 
 func setEnv(key, value string) {

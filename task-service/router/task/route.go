@@ -16,4 +16,6 @@ func (*TaskRouter) Route(r *gin.Engine) {
 	//用户自定义api接口 路径
 	r.POST("/api/*path", task.ApiData)
 	r.GET("/rundocker", task.RunDocker)
+	r.GET("/stopdocker", task.StopDocker)
+	r.GET("/restartdocker", task.RestartDocker)
 }
