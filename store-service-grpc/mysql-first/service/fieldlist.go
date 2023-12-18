@@ -9,7 +9,7 @@ import (
 )
 
 // GetColumnNameList  获取数据表的列名
-func GetColumnNameList(db *gorm.DB) []common.Table {
+func GetColumnNameList(db *gorm.DB, databaseName string) []common.Table {
 	var tableList []common.Table
 	var table common.Table
 	var tables []string
@@ -34,18 +34,25 @@ func GetColumnNameList(db *gorm.DB) []common.Table {
 		query := "desc " + tableName
 		db.Raw(query).Scan(&info)
 		for _, v := range info {
+			if v.Field[len(v.Field)-2:] == "id" {
+				table.RelateFlag = v.Field
+			}
 			columns = append(columns, v.Field)
 		}
+
+		table.SourceName = "mysql1"
+		table.DatabaseName = databaseName
 		table.TableName = tableName
 		table.ColumnList = columns
 		tableList = append(tableList, table)
-		//fmt.Printf("Table: %s\n Columns: %+v\n", tableName, columns)
 	}
 	return tableList
 }
 
 // GetDataByColumnList 获取数据表中指定字段的数据
-func GetDataByColumnList(databaseName string, tableList []common.Table) []map[string]interface{} {
+func GetDataByColumnList(table common.Table) []map[string]interface{} {
+	databaseName := table.DatabaseName
+
 	//根据传入的数据库选择操作数据库的对象
 	var db *gorm.DB
 	if databaseName == "df_education" {
@@ -54,7 +61,6 @@ func GetDataByColumnList(databaseName string, tableList []common.Table) []map[st
 		db = dao.Library
 	}
 	//数据表列表中的table
-	table := tableList[0] //列表1
 	log.Printf("table => %+v", table)
 	log.Printf("column => %+v", table.ColumnList)
 

@@ -18,7 +18,7 @@ func CreateTableBySQL(db *gorm.DB, tableName string, columns []string) {
 	for _, column := range columns {
 		if column[len(column)-2:] == "id" || column == "state" {
 			createTableSQL += fmt.Sprintf(", %s INT ", column)
-		} else if column[len(column)-4:] == "time" {
+		} else if len(column) > 4 && column[len(column)-4:] == "time" {
 			createTableSQL += fmt.Sprintf(", %s BIGINT(11) ", column)
 		} else {
 			createTableSQL += fmt.Sprintf(", %s VARCHAR(255) ", column)

@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"github.com/carlmjohnson/requests"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -9,6 +8,7 @@ import (
 	"store-service/config"
 	"store-service/dao"
 	"store-service/model"
+	"store-service/service"
 	"strconv"
 )
 
@@ -16,37 +16,19 @@ import (
 
 // GetBottomDatabaseNameList 获取数据库字段列表
 func (*StoreHandle) GetBottomDatabaseNameList(ctx *gin.Context) {
-
 	//数据源
-	var dataFromList []common.DataSource
-	var dataFrom common.DataSource
+	var result []common.Table
+	role := ctx.Request.Header.Get("role")
 
-	var first []common.Database
-	err := requests.URL("http://localhost:8085").
-		Path("/getInfo").
-		ToJSON(&first).Fetch(ctx)
-	if err != nil {
-		log.Printf("err => %+v", err)
-	}
-	var second []common.Database
-	err = requests.URL("http://localhost:8086").
-		Path("/getInfo").
-		ToJSON(&second).Fetch(ctx)
-	if err != nil {
-		log.Printf("err => %+v", err)
+	if role == "admin" {
+		//登录用户为管理员 从底层数据库拉取数据源供管理员使用
+		result = service.GetBottomTableInfo(ctx)
+	} else if role == "user" {
+		//登录用户为普通用户 拉取数据仓库中的公共数据源供用户使用
+		result = service.GetWarehousePublicTableInfo()
 	}
 
-	log.Printf("data => %+v", second)
-
-	dataFrom.FromName = "mysql1"
-	dataFrom.Databases = first
-	dataFromList = append(dataFromList, dataFrom)
-
-	dataFrom.FromName = "mysql2"
-	dataFrom.Databases = second
-	dataFromList = append(dataFromList, dataFrom)
-
-	ctx.JSON(200, res.Success(dataFromList))
+	ctx.JSON(200, res.Success(result))
 }
 
 // GetUserDatabaseNameList 获取用户创建的数据表信息
@@ -73,7 +55,9 @@ func (*StoreHandle) GetUserDatabaseNameList(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, res.Success(result))
-} // GetUserTableData 获取用户创建数据库的数据
+}
+
+// GetUserTableData 获取用户创建数据库的数据
 func (*StoreHandle) GetUserTableData(ctx *gin.Context) {
 	//TODO 传入一个表名
 	databaseName := ctx.PostForm("database_name")

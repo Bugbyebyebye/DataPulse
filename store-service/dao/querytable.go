@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"store-service/common"
+	"store-service/config"
 )
 
 //数据仓库查询操作
@@ -43,4 +44,25 @@ func GetAllColumnName(tableName string, db *gorm.DB) []string {
 		columns = append(columns, v.Field)
 	}
 	return columns
+}
+
+// GetDataByColumnList 获取数据表中指定字段的数据
+func GetDataByColumnList(table common.Table) []map[string]interface{} {
+	databaseName := table.DatabaseName
+
+	//根据传入的数据库选择操作数据库的对象
+	var db *gorm.DB
+	if databaseName == "df_warehouse" {
+		db = config.Warehouse
+	} else if databaseName == "df_warehouse2" {
+		db = config.Warehouse2
+	}
+	//数据表列表中的table
+	log.Printf("table => %+v", table)
+	log.Printf("column => %+v", table.ColumnList)
+
+	result := config.QueryColumnData(db, table.TableName, table.ColumnList)
+	log.Printf("result => %+v", result)
+
+	return result
 }

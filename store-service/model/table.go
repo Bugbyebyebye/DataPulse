@@ -43,6 +43,13 @@ func InitTable(tableName string, databaseName string, tableType int, fieldNum in
 	return tableInfo.TableId, err
 }
 
+// GetAllPublicTable 获取全部公共数据表信息
+func GetAllPublicTable() ([]map[string]interface{}, error) {
+	var tables []map[string]interface{}
+	err := config.System.Model(TableInfo{}).Where("table_type = ?", 0).Find(&tables).Error
+	return tables, err
+}
+
 // GetTableInfo 获取数据库信息
 func GetTableInfo(tableId int) (map[string]interface{}, error) {
 	var tableInfo TableInfo
