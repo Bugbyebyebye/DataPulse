@@ -66,7 +66,7 @@ func GetDataByColumnList(table common.Table) []map[string]interface{} {
 	log.Printf("column => %+v", table.ColumnList)
 
 	result := dao.QueryColumnData(db, table.TableName, table.ColumnList)
-	log.Printf("result => %+v", result)
+	//log.Printf("result => %+v", result)
 
 	return result
 }

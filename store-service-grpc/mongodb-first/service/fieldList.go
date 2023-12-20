@@ -34,7 +34,7 @@ func GetColumnNameList(client *mongo.Client) []common.Table {
 
 		//添加到数据表列表
 		tableList = append(tableList, table)
-		fmt.Printf("Database: %s, Collection: %s, Fields: %+v\n", "article", collectionName, table.ColumnList)
+		//fmt.Printf("Database: %s, Collection: %s, Fields: %+v\n", "article", collectionName, table.ColumnList)
 	}
 
 	return tableList
@@ -93,7 +93,7 @@ func GetColumnData(table common.Table) []map[string]interface{} {
 	if err != nil {
 		log.Printf("err => %s", err)
 	}
-	log.Printf("result => %v", result)
+	//log.Printf("result => %v", result)
 
 	return result
 }

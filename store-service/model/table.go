@@ -43,6 +43,15 @@ func InitTable(tableName string, databaseName string, tableType int, fieldNum in
 	return tableInfo.TableId, err
 }
 
+// UpdateFieldNum 更新数据表字段数
+func UpdateFieldNum(databaseName string, tableName string, fieldNum int) error {
+	err := config.System.Model(TableInfo{}).Updates(map[string]interface{}{
+		"field_num":   fieldNum,
+		"update_time": util.GetUnixTime(),
+	}).Where("database_name = ? and table_name = ?", databaseName, tableName).Error
+	return err
+}
+
 // GetAllPublicTable 获取全部公共数据表信息
 func GetAllPublicTable() ([]map[string]interface{}, error) {
 	var tables []map[string]interface{}

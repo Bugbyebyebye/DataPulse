@@ -6,22 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"math/big"
-	"net/http"
 	"task-service/auto/api"
 	"time"
 )
 
 var res result.Result
-
-func (*TaskHandle) Default(ctx *gin.Context) {
-
-	ctx.JSON(200, res.Success("task服务"))
-}
-
-func (*TaskHandle) CreateApi(ctx *gin.Context) {
-
-	ctx.JSON(http.StatusOK, res.Success("服务生成成功！"))
-}
 
 // RandomString 生成随机字符串
 func RandomString(length int) (string, error) {
@@ -101,12 +90,4 @@ func (*TaskHandle) StopDocker(ctx *gin.Context) {
 	case <-time.After(5 * time.Second): // 等待5秒
 		ctx.JSON(200, res.Success("服务Loop.请尽快联系管理员"))
 	}
-}
-
-func (*TaskHandle) ApiData(ctx *gin.Context) {
-	url := ctx.Request.URL
-	log.Printf("url => %s", url)
-	param := ctx.Param("path")
-	log.Printf("param => %s", param)
-	ctx.JSON(http.StatusOK, res.Success(url))
 }
