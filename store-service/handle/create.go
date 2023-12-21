@@ -11,6 +11,7 @@ import (
 	"store-service/config"
 	"store-service/dao"
 	"store-service/model"
+	"strconv"
 )
 
 //创建数据表 追加字段
@@ -18,7 +19,8 @@ import (
 // CreateTheTable 创建数据仓库数据表
 func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 	//从token获取用户id
-	id := ctx.GetInt("id")
+	idStr := ctx.Request.Header.Get("id")
+	log.Printf("user id => %+v", idStr)
 
 	var req common.CreateReq
 	err := ctx.BindJSON(&req)
@@ -51,7 +53,23 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 	if err != nil {
 		log.Printf("err => %s", err)
 	}
+
+	//构建数据库数据表关联
+	databaseId, err := model.GetDatabaseIdByName(targetDatabase)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	err = model.AddTableNumByName(targetDatabase) //增减数据库表数量
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	err = model.InsertData(databaseId, tableId) //新增数据库数据表关联关系数据
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+
 	//初始化数据表和用户关联
+	id, _ := strconv.Atoi(idStr)
 	err = model.InitTableUser(tableId, id)
 	if err != nil {
 		log.Printf("err => %s", err)
@@ -60,18 +78,17 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 	log.Printf("tableList => %+v", tableList)
 	//根据数据源选择底层数据来源
 	for i, t := range tableList {
-
 		var bottom []map[string]interface{}
 		if t.SourceName == "mysql" {
 			bottom = dao.GetDataByColumnList(t)
-			log.Printf("bottom => %+v\n", bottom)
+			//log.Printf("bottom => %+v\n", bottom)
 		} else if t.SourceName == "mysql1" {
 			err := requests.URL("http://mysql-first:8085").
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).
 				Fetch(ctx)
-			log.Printf("bottom => %+v\n", bottom)
+			//log.Printf("bottom => %+v\n", bottom)
 			if err != nil {
 				log.Printf("err => %s", err)
 			}
@@ -81,7 +98,7 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 				BodyJSON(&t).
 				ToJSON(&bottom).
 				Fetch(ctx)
-			log.Printf("bottom => %+v", bottom)
+			//log.Printf("bottom => %+v", bottom)
 			if err != nil {
 				log.Printf("err => %s", err)
 			}
@@ -91,7 +108,7 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 				BodyJSON(&t).
 				ToJSON(&bottom).
 				Fetch(ctx)
-			log.Printf("bottom => %+v", bottom)
+			//log.Printf("bottom => %+v", bottom)
 			if err != nil {
 				log.Printf("err => %s", err)
 			}
@@ -130,20 +147,21 @@ func (*StoreHandle) AlertTable(ctx *gin.Context) {
 
 	//向数据表中追加新增字段
 	dao.AlertTableBySQL(db, targetTable, columns)
+	err = model.UpdateFieldNum(targetDatabase, targetTable, len(columns))
 
 	//根据数据源选择数据来源
 	for _, t := range tableList {
 		var bottom []map[string]interface{}
 		if t.SourceName == "mysql" {
 			bottom = dao.GetDataByColumnList(t)
-			log.Printf("bottom => %+v\n", bottom)
+			//log.Printf("bottom => %+v\n", bottom)
 		} else if t.SourceName == "mysql1" {
 			err := requests.URL("http://mysql-first:8085").
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).
 				Fetch(ctx)
-			log.Printf("bottom => %+v\n", bottom)
+			//log.Printf("bottom => %+v\n", bottom)
 			if err != nil {
 				log.Printf("err => %s", err)
 			}
@@ -153,7 +171,7 @@ func (*StoreHandle) AlertTable(ctx *gin.Context) {
 				BodyJSON(&t).
 				ToJSON(&bottom).
 				Fetch(ctx)
-			log.Printf("bottom => %+v\n", bottom)
+			//log.Printf("bottom => %+v\n", bottom)
 			if err != nil {
 				log.Printf("err => %s", err)
 			}
@@ -163,7 +181,7 @@ func (*StoreHandle) AlertTable(ctx *gin.Context) {
 				BodyJSON(&t).
 				ToJSON(&bottom).
 				Fetch(ctx)
-			log.Printf("bottom => %+v\n", bottom)
+			//log.Printf("bottom => %+v\n", bottom)
 			if err != nil {
 				log.Printf("err => %s", err)
 			}

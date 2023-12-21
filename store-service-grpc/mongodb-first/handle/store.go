@@ -13,7 +13,7 @@ import (
 func (*StoreHandle) GetDatabaseColumnNameList(ctx *gin.Context) {
 	//传入连接名
 	article := service.GetColumnNameList(dao.Article)
-	log.Printf("article => %+v", article)
+	//log.Printf("article => %+v", article)
 	ctx.JSON(http.StatusOK, article)
 }
 
@@ -26,7 +26,7 @@ func (*StoreHandle) GetColumnData(ctx *gin.Context) {
 		log.Printf("err => %s", err)
 	}
 	result := service.GetColumnData(table)
-	log.Printf("result => %+v", result)
+	//log.Printf("result => %+v", result)
 
 	ctx.JSON(http.StatusOK, result)
 }

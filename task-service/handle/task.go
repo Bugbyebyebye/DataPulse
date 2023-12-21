@@ -6,22 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"math/big"
-	"net/http"
 	"task-service/auto/api"
 	"time"
 )
 
 var res result.Result
-
-func (*TaskHandle) Default(ctx *gin.Context) {
-
-	ctx.JSON(200, res.Success("task服务"))
-}
-
-func (*TaskHandle) CreateApi(ctx *gin.Context) {
-
-	ctx.JSON(http.StatusOK, res.Success("服务生成成功！"))
-}
 
 // RandomString 生成随机字符串
 func RandomString(length int) (string, error) {
