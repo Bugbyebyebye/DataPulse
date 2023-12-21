@@ -2,11 +2,6 @@
 server:
   Name: "store-service"
   Addr: "localhost:8083"
-# GRPC 服务配置
-etcd:
-  Name: "etcd"
-  Addrs:
-    - "localhost:2379"
 # 数据库配置
 mysql:
   Host: "222.186.50.126:20134"

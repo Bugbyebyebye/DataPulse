@@ -5,7 +5,9 @@ import (
 	"auth-service/util"
 	"commons/result"
 	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"log"
 	"net/http"
 	"strconv"
@@ -61,4 +63,28 @@ func (*AuthHandler) PostEmailCode(ctx *gin.Context) {
 	//将验证码存入redis 有效时间3min
 	dao.Rc.Put(context.Background(), "DATAPULSE"+email, strconv.Itoa(code), 3*time.Minute)
 	ctx.JSON(200, res.Success("验证码发送成功！"))
+}
+
+// VerifyToken 校验token
+func (*AuthHandler) VerifyToken(ctx *gin.Context) {
+	var token string
+	err := ctx.BindJSON(&token)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	log.Printf("token => %s", token)
+
+	claims, err := util.ParseToken(token)
+	if err != nil {
+		//log.Printf("err => %s", err)
+		if errors.Is(err, jwt.ErrInvalidKey) {
+			ctx.JSON(http.StatusOK, res.Fail(4001, "token 无效！"))
+			return
+		} else if errors.Is(err, jwt.ErrTokenExpired) {
+			ctx.JSON(http.StatusOK, res.Fail(4002, "token 过期！"))
+			return
+		}
+	}
+
+	ctx.JSON(http.StatusOK, res.Success(claims))
 }

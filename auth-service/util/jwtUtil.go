@@ -11,7 +11,7 @@ type MyClaims struct {
 	Id        int    `json:"id"`
 	Username  string `json:"username"`
 	Role      string `json:"role"`
-	Authority int    `json:"Authority"`
+	Authority int    `json:"authority"`
 	jwt.RegisteredClaims
 }
 

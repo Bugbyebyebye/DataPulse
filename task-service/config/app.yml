@@ -2,11 +2,6 @@
 server:
   Name: "task-service"
   Addr: "localhost:8084"
-# GRPC 服务配置
-etcd:
-  Name: "etcd"
-  Addrs:
-    - "8.130.84.188:2379"
 # 数据库配置
 mysql:
   Host: "localhost:3306"
