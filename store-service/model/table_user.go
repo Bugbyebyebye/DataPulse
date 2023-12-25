@@ -46,3 +46,13 @@ func GetTableIdList(userId int) ([]int, error) {
 	err := config.System.Model(&tur).Where("user_id = ?", userId).Select("table_id").Find(&result).Error
 	return result, err
 }
+
+// DeleteUserTableRelate 逻辑删除用户数据表关联
+func DeleteUserTableRelate(userId int, tableId int) error {
+	err := config.System.Model(TableUserRelate{}).Where("user_id = ? and table_id = ?", userId, tableId).Updates(map[string]interface{}{
+		"state":       0,
+		"update_time": util.GetUnixTime(),
+	}).Error
+
+	return err
+}

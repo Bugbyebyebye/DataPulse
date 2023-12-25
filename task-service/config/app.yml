@@ -9,6 +9,6 @@ etcd:
     - "etcd:2379"
 # 数据库配置
 mysql:
-  Host: "localhost:3306"
+  Host: "222.186.50.126:20134"
   Name: "root"
-  Password: "123698745"
+  Password: "maojiukeai1412"

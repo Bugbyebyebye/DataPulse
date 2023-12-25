@@ -8,7 +8,7 @@ type CreateReq struct {
 }
 
 type Table struct {
-	RelateFlag   string   `json:"relate_flag"`
+	RelateFlag   string   `json:"relate_flag,omitempty"`
 	SourceName   string   `json:"source_name"`
 	DatabaseName string   `json:"database_name"`
 	TableName    string   `json:"table_name"`

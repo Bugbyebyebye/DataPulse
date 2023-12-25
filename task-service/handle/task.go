@@ -3,15 +3,14 @@ package handle
 import (
 	"commons/result"
 	"crypto/rand"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"math/big"
 	"net/http"
 	"task-service/auto/api"
+	"task-service/model"
 	"time"
 )
-
-var res result.Result
 
 // RandomString 生成随机字符串
 func RandomString(length int) (string, error) {
@@ -31,16 +30,32 @@ func RandomString(length int) (string, error) {
 }
 
 func (*TaskHandle) RunDocker(ctx *gin.Context) {
-	port := ctx.Query("port")
-	name := ctx.Query("name")
-	log.Printf("port %s name %s", port, name)
+	res := &result.Result{}
+	var req map[string]interface{}
+	// 通过 BindJSON 将 JSON 数据绑定到 map 中
+	if err := ctx.BindJSON(&req); err != nil {
+		fmt.Printf("json数据错误 err => %s", err)
+		ctx.JSON(http.StatusOK, res.Fail(400, "json数据错误！"))
+		return
+	}
+	UserId := 1 //todo 更改为获取用户的id
+	APIName, ok := req["api_name"].(string)
+	APIDesc, ok := req["api_desc"].(string)
+	if ok {
+		fmt.Println("断言成功")
+	}
+	//port := ctx.Query("port")
+	//name := ctx.Query("name")
+	//log.Printf("port %s name %s", port, name)
 	tunnel := make(chan string)
 	namestr, err := RandomString(8)
 	if err != nil {
 		ctx.JSON(200, res.Fail(400, "生成随机字符串失败"))
 	}
+	//将字符串拼接为链接
+	APIUrl := fmt.Sprintf("%s.emotionalbug.top", namestr)
 	go func() {
-		err, _ := api.RunDocker(port, namestr)
+		err := api.RunDocker(namestr)
 		if err != nil {
 			tunnel <- "服务生成出错，请检查日志"
 		}
@@ -50,8 +65,17 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 	case response := <-tunnel:
 		ctx.JSON(200, res.Fail(400, response))
 	case <-time.After(5 * time.Second): // 等待5秒
-		ctx.JSON(200, res.Success("生成api的链接为:"+namestr+".emotionalbug.top"))
+		err := model.InsetAPIList(APIName, APIUrl, APIDesc, UserId)
+		if err != nil {
+			fmt.Println("插入出错")
+		}
+		ctx.JSON(200, res.Success(namestr+"emotionalbug.top"))
 	}
+	//err = model.InsetAPIList(APIName, APIUrl, APIDesc, UserId)
+	//if err != nil {
+	//	fmt.Println("插入出错")
+	//}
+
 }
 
 func (*TaskHandle) RestartDocker(ctx *gin.Context) {
@@ -91,11 +115,4 @@ func (*TaskHandle) StopDocker(ctx *gin.Context) {
 	case <-time.After(5 * time.Second): // 等待5秒
 		ctx.JSON(200, res.Success("服务Loop.请尽快联系管理员"))
 	}
-}
-func (*TaskHandle) ApiData(ctx *gin.Context) {
-	url := ctx.Request.URL
-	log.Printf("url => %s", url)
-	param := ctx.Param("path")
-	log.Printf("param => %s", param)
-	ctx.JSON(http.StatusOK, res.Success(url))
 }

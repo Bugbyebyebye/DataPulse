@@ -80,12 +80,12 @@ func CreateAPi(portStr string, pathStr string, funcName string) {
 	fmt.Println(string(out))
 }
 
-func RunDocker(portStr, namestr string) (error error, serverurl string) {
+func RunDocker(namestr string) (error error) {
 	setEnv("MYSQL_HOST", "222.186.50.126:20010")
 	setEnv("USERNAME", "sora")
 	setEnv("MYSQL_NAME", "root")
 	setEnv("MYSQL_PASSWORD", "maojiukeai1412")
-	setEnv("PORT", portStr)
+	//setEnv("PORT", portStr)
 	// 构建 Docker 命令
 	cmd := exec.Command("docker", "run",
 		"--env", fmt.Sprintf("MYSQL_HOST=%s", "222.186.50.126:20010"),
@@ -108,14 +108,14 @@ func RunDocker(portStr, namestr string) (error error, serverurl string) {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("启动服务失败，报错为:", err)
-		return err, ""
+		return err
 	}
 
 	//todo 实现将生成的链接/容器名存在数据库中
 	// 打印命令输出
 	fmt.Println(string(output))
-	serverstr := fmt.Sprintf("%s.emotionalbug.top", namestr)
-	return nil, serverstr
+	//serverstr := fmt.Sprintf("%s.emotionalbug.top", namestr)
+	return nil
 }
 
 func StopDocker(name string) []byte {
