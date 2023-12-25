@@ -52,6 +52,16 @@ func UpdateFieldNum(databaseName string, tableName string, fieldNum int) error {
 	return err
 }
 
+// DeleteTable 删除数据表
+func DeleteTable(tableId int) error {
+	err := config.System.Model(TableInfo{}).Where("table_id = ?", tableId).Updates(map[string]interface{}{
+		"state":       0,
+		"update_time": util.GetUnixTime(),
+	}).Error
+
+	return err
+}
+
 // GetAllPublicTable 获取全部公共数据表信息
 func GetAllPublicTable() ([]map[string]interface{}, error) {
 	var tables []map[string]interface{}

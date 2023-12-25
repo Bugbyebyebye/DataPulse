@@ -72,3 +72,32 @@ func (*StoreHandle) GetUserTableData(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, res.Success(result))
 }
+
+type TargetInfo struct {
+	Database   string   `json:"database_name"`
+	Table      string   `json:"table_name"`
+	ColumnList []string `json:"column_list"`
+}
+
+// GetWarehouseDatabaseNameList 获取数据仓库中数据库数据表信息
+func (*StoreHandle) GetWarehouseDatabaseNameList(ctx *gin.Context) {
+	var targetList []common.Table
+	databaseNames := []string{"df_warehouse", "df_warehouse2"}
+	for _, database := range databaseNames {
+		db := config.GetDbByDatabaseName(database)
+		//log.Printf("db => %+v", db)
+		tableNames := dao.GetAllTableName(db)
+		for _, table := range tableNames {
+			columnNames := dao.GetAllColumnName(table, db)
+			var target common.Table
+			target.SourceName = "mysql"
+			target.DatabaseName = database
+			target.TableName = table
+			target.ColumnList = columnNames
+
+			targetList = append(targetList, target)
+		}
+	}
+
+	ctx.JSON(http.StatusOK, res.Success(targetList))
+}
