@@ -15,7 +15,7 @@ func (*StoreRouter) Route(r *gin.Engine) {
 	r.GET("/getInfo", store.GetBottomDatabaseNameList)
 	//获取数据仓库信息
 	r.GET("/getUserTable", store.GetUserDatabaseNameList)
-	r.GET("/getTableData", store.GetUserTableData)
+	r.POST("/getTableData", store.GetUserTableData)
 	//创建数据仓库新数据表
 	r.POST("/createTable", store.CreateTheTable)
 	r.POST("/alertTable", store.AlertTable)
