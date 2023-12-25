@@ -89,14 +89,15 @@ func (c *Config) ReaderServerConfigEnv() {
 	RedisDB, err := strconv.Atoi(RedisDb) // 将字符串转换为整数
 	if err != nil {
 		// 处理转换错误
+		fmt.Println(err)
 		fmt.Println("类型转换错误")
 	}
-	GrpcWeigit := os.Getenv("GRPCWEIGHT")
-	GRPCWeight, err := strconv.Atoi(GrpcWeigit)
-	if err != nil {
-		fmt.Println("类型转换错误")
-	}
-	GRPCWeightInt64 := int64(GRPCWeight) // 将 int 转换为 int64
+	//GrpcWeigit := os.Getenv("GRPCWEIGHT")
+	//GRPCWeight, err := strconv.Atoi(GrpcWeigit)
+	//if err != nil {
+	//	fmt.Println("类型转换错误")
+	//}
+	//GRPCWeightInt64 := int64(GRPCWeight) // 将 int 转换为 int64
 	////转换为切片
 	//etcdAddr := os.Getenv("ETCDADDR")    // 获取环境变量的值
 	//addresses := []string{}
@@ -130,12 +131,12 @@ func (c *Config) ReaderServerConfigEnv() {
 		Name: os.Getenv("SERVERNAME"),
 		Addr: os.Getenv("SERVERADDR"),
 	}
-	c.GRPC = &GrpcConfig{
-		Name:    os.Getenv("GRPCNAME"),
-		Addr:    os.Getenv("GRPCADDR"),
-		Version: os.Getenv("GRPCVERSION"),
-		Weight:  GRPCWeightInt64,
-	}
+	//c.GRPC = &GrpcConfig{
+	//	Name:    os.Getenv("GRPCNAME"),
+	//	Addr:    os.Getenv("GRPCADDR"),
+	//	Version: os.Getenv("GRPCVERSION"),
+	//	Weight:  GRPCWeightInt64,
+	//}
 	//c.ETCD = &EtcdConfig{
 	//	Name:  os.Getenv("ETCDNAME"),
 	//	Addrs: addresses,
