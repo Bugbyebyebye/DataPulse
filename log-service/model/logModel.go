@@ -8,10 +8,10 @@ import (
 )
 
 // SearchUserLogs 通过用户查询日志
-func SearchUserLogs(user, table string) ([]map[string]interface{}, error) {
-	query := fmt.Sprintf("SELECT * FROM %s WHERE user_name = ? AND state != 0", table)
+func SearchUserLogs(userid int, table string) ([]map[string]interface{}, error) {
+	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = ? AND state != 0", table)
 	// 执行查询
-	rows, err := dao.Db.Query(query, user)
+	rows, err := dao.Db.Query(query, userid)
 	if err != nil {
 		return nil, err
 	}
@@ -73,15 +73,15 @@ func SearchUserLogs(user, table string) ([]map[string]interface{}, error) {
 */
 
 // DeleteUserLogs 删除用户相关的所有日志
-func DeleteUserLogs(user string, table string) error {
+func DeleteUserLogs(userid int, table string) error {
 	// 确保连接正常
 	err := dao.Db.Ping()
 	if err != nil {
 		fmt.Printf("数据库不健康 : %s\n", err.Error())
 		return err
 	}
-	query := fmt.Sprintf("UPDATE %s SET state = 0 WHERE user_name = ?", table)
-	_, err = dao.Db.Exec(query, user)
+	query := fmt.Sprintf("UPDATE %s SET state = 0 WHERE user_id = ?", table)
+	_, err = dao.Db.Exec(query, userid)
 	return err
 }
 
@@ -115,42 +115,32 @@ func DeleteOneLogs(id int, table string) error {
 数据库插入操作
 */
 
-// RecordUserLoginLog 插入用户登陆日志记录数据库
-func RecordUserLoginLog(UserName string) error {
-	query := `INSERT INTO login_logs_info (user_name, login_time, state) VALUES (?, ?, ?)`
-	// 执行插入操作
-	logDate := util.GetUnixTime()
-	State := 1
-	_, err := dao.Db.Exec(query, UserName, logDate, State)
-	return err
-}
-
 // RecordUserActionLog 插入用户操作日志记录数据库
-func RecordUserActionLog(UserName, Content, Status string) error {
-	query := `INSERT INTO action_logs_info (user_name, content, status, update_time, state) VALUES (?, ?, ?, ?, ?)`
+func RecordUserActionLog(UserId, Content, Status string) error {
+	query := `INSERT INTO action_logs_info (user_id, content, status, update_time, state) VALUES (?, ?, ?, ?, ?)`
 	// 执行插入操作
 	logDate := util.GetUnixTime()
 	State := 1
-	_, err := dao.Db.Exec(query, UserName, Content, Status, logDate, State)
+	_, err := dao.Db.Exec(query, UserId, Content, Status, logDate, State)
 	return err
 }
 
 // RecordUserTackLog 插入任务调度日志记录数据库
-func RecordUserTackLog(UserName, TaskName, TaskStatus, Takingtime string) error {
-	query := `INSERT INTO task_log_info (user_name, task_name, task_status ,update_time, state, taking_time) VALUES (?, ?, ?, ?, ?, ?)`
+func RecordUserTackLog(UserId, TaskName, TaskStatus, Takingtime string) error {
+	query := `INSERT INTO task_log_info (user_id, task_name, task_status ,update_time, state, taking_time) VALUES (?, ?, ?, ?, ?, ?)`
 	// 执行插入操作
 	logDate := util.GetUnixTime()
 	State := 1
-	_, err := dao.Db.Exec(query, UserName, TaskName, TaskStatus, logDate, State, Takingtime)
+	_, err := dao.Db.Exec(query, UserId, TaskName, TaskStatus, logDate, State, Takingtime)
 	return err
 }
 
 // RecordUserInvokeLog 插入api调用日志记录数据库
-func RecordUserInvokeLog(ApiUrl, UserName, Invokeip, Invokelog, Status string) error {
-	query := `INSERT INTO invoke_log_info (api_url, state, user_name, status, invoke_time, invoke_ip, invoke_log) VALUES (?, ?, ?, ?, ?, ?, ?)`
+func RecordUserInvokeLog(ApiUrl, UserId, Invokeip, Invokelog, Status string) error {
+	query := `INSERT INTO invoke_log_info (api_url, state, user_id, status, invoke_time, invoke_ip, invoke_log) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	// 执行插入操作
 	logDate := util.GetUnixTime()
 	State := 1
-	_, err := dao.Db.Exec(query, ApiUrl, State, UserName, Status, logDate, Invokeip, Invokelog)
+	_, err := dao.Db.Exec(query, ApiUrl, State, UserId, Status, logDate, Invokeip, Invokelog)
 	return err
 }
