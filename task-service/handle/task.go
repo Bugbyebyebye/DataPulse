@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"math/big"
 	"net/http"
+	"strconv"
 	"task-service/auto/api"
 	"task-service/model"
 	"time"
@@ -38,7 +39,13 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, res.Fail(400, "json数据错误！"))
 		return
 	}
-	UserId := 1 //todo 更改为获取用户的id
+	get := ctx.Request.Header.Get("id")
+	// 尝试将字符串转换为整数
+	UserId, err := strconv.Atoi(get)
+	if err != nil {
+		// 转换失败，处理错误
+		fmt.Println("转换失败:", err)
+	}
 	APIName, ok := req["api_name"].(string)
 	APIDesc, ok := req["api_desc"].(string)
 	if ok {
@@ -69,7 +76,7 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 		if err != nil {
 			fmt.Println("插入出错")
 		}
-		ctx.JSON(200, res.Success(namestr+"emotionalbug.top"))
+		ctx.JSON(200, res.Success(namestr+".emotionalbug.top"))
 	}
 	//err = model.InsetAPIList(APIName, APIUrl, APIDesc, UserId)
 	//if err != nil {
