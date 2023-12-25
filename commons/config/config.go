@@ -3,21 +3,26 @@ package config
 //配置 读取yml配置文件
 
 import (
+	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
-	"log"
 	"os"
+	"strconv"
 )
 
-var Conf = InitConfig()
+var (
+	Conf = InitConfig()
+)
 
 type Config struct {
-	viper *viper.Viper
-	SC    *ServerConfig
-	RC    *RedisConfig
-	MC    *MysqlConfig
-	GRPC  *GrpcConfig
-	ETCD  *EtcdConfig
-	SMTP  *SmtpConfig
+	viper   *viper.Viper
+	SC      *ServerConfig
+	RC      *RedisConfig
+	MC      *MysqlConfig
+	GRPC    *GrpcConfig
+	ETCD    *EtcdConfig
+	SMTP    *SmtpConfig
+	WEBHOOK *SendWebHook
 }
 
 // ServerConfig 服务器配置
@@ -61,63 +66,78 @@ type EtcdConfig struct {
 	Addrs []string
 }
 
+// SendWebHook SendWebHookUrl SendWebHook 发送日志通知
+type SendWebHook struct {
+	SendUrl string
+}
+
 // InitConfig 获取yml配置初始化
 func InitConfig() *Config {
-	c := &Config{viper: viper.New()}
-	workDir, _ := os.Getwd()
-	c.viper.SetConfigName("app")
-	c.viper.SetConfigType("yml")
-	c.viper.AddConfigPath(workDir + "/config")
-	err := c.viper.ReadInConfig()
-	if err != nil {
-		log.Fatalln(err)
-		return nil
+	c := &Config{}
+
+	// 尝试从 .env 文件加载环境变量
+	if err := godotenv.Load(); err != nil {
+		fmt.Println("没有.env文件，尝试从系统环境变量中获取")
 	}
-	c.ReaderServerConfig()
+
+	c.ReaderServerConfigEnv()
 	return c
 }
 
-// ReaderServerConfig 读取配置方法
-func (c *Config) ReaderServerConfig() {
-	//读取Gin Web服务配置
-	sc := &ServerConfig{}
-	sc.Name = c.viper.GetString("server.Name")
-	sc.Addr = c.viper.GetString("server.Addr")
-	c.SC = sc
-	//读取GRPC 服务配置
-	grpc := &GrpcConfig{}
-	grpc.Name = c.viper.GetString("grpc.Name")
-	grpc.Addr = c.viper.GetString("grpc.Addr")
-	grpc.Version = c.viper.GetString("grpc.Version")
-	grpc.Weight = c.viper.GetInt64("grpc.Weight")
-	c.GRPC = grpc
-	//读取ETCD 服务配置
-	etcd := &EtcdConfig{}
-	etcd.Name = c.viper.GetString("etcd.Name")
-	var addrs []string
-	err := c.viper.UnmarshalKey("etcd.Addrs", &addrs)
+func (c *Config) ReaderServerConfigEnv() {
+	RedisDb := os.Getenv("redisDb")       // 获取环境变量的值
+	RedisDB, err := strconv.Atoi(RedisDb) // 将字符串转换为整数
 	if err != nil {
-		log.Fatalln(err)
+		// 处理转换错误
+		fmt.Println("类型转换错误")
 	}
-	etcd.Addrs = addrs
-	c.ETCD = etcd
-	//读取Redis 配置
-	rc := &RedisConfig{}
-	rc.Host = c.viper.GetString("redis.Host")
-	rc.Password = c.viper.GetString("redis.Password")
-	rc.Db = c.viper.GetInt("redis.Db")
-	c.RC = rc
-	// 读取Mysql 服务配置
-	mc := &MysqlConfig{}
-	mc.Host = c.viper.GetString("mysql.Host")
-	mc.Name = c.viper.GetString("mysql.Name")
-	mc.Password = c.viper.GetString("mysql.Password")
-	c.MC = mc
-	//读取Smtp配置
-	sm := &SmtpConfig{}
-	sm.Host = c.viper.GetString("smtp.Host")
-	sm.Username = c.viper.GetString("smtp.Username")
-	sm.Password = c.viper.GetString("smtp.Password")
-	sm.Fromname = c.viper.GetString("smtp.Fromname")
-	c.SMTP = sm
+	GrpcWeigit := os.Getenv("GRPCWEIGHT")
+	GRPCWeight, err := strconv.Atoi(GrpcWeigit)
+	if err != nil {
+		fmt.Println("类型转换错误")
+	}
+	GRPCWeightInt64 := int64(GRPCWeight) // 将 int 转换为 int64
+	////转换为切片
+	//etcdAddr := os.Getenv("ETCDADDR")    // 获取环境变量的值
+	//addresses := []string{}
+	//
+	//if etcdAddr != "" {
+	//	addresses = strings.Split(etcdAddr, ",")
+	//	for i, addr := range addresses {
+	//		addresses[i] = strings.TrimSpace(addr) // 去除地址两端的空格
+	//	}
+	//}
+	c.WEBHOOK = &SendWebHook{
+		SendUrl: os.Getenv("SendUrl"),
+	}
+	c.SMTP = &SmtpConfig{
+		Host:     os.Getenv("smtpHost"),
+		Username: os.Getenv("smtpUsername"),
+		Password: os.Getenv("smtpPassword"),
+		Fromname: os.Getenv("smtpFromname"),
+	}
+	c.MC = &MysqlConfig{
+		Host:     os.Getenv("MYSQLHOST"),
+		Name:     os.Getenv("MYSQLNAME"),
+		Password: os.Getenv("MYSQLPASSWORD"),
+	}
+	c.RC = &RedisConfig{
+		Host:     os.Getenv("redisHost"),
+		Password: os.Getenv("redisPassword"),
+		Db:       RedisDB,
+	}
+	c.SC = &ServerConfig{
+		Name: os.Getenv("SERVERNAME"),
+		Addr: os.Getenv("SERVERADDR"),
+	}
+	c.GRPC = &GrpcConfig{
+		Name:    os.Getenv("GRPCNAME"),
+		Addr:    os.Getenv("GRPCADDR"),
+		Version: os.Getenv("GRPCVERSION"),
+		Weight:  GRPCWeightInt64,
+	}
+	//c.ETCD = &EtcdConfig{
+	//	Name:  os.Getenv("ETCDNAME"),
+	//	Addrs: addresses,
+	//}
 }
