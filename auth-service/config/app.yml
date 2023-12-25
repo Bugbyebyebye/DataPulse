@@ -1,20 +1,20 @@
 # Gin web服务配置
 server:
   Name: "auth-service"
-  Addr: "localhost:8081"
+  Addr: "auth-service:8081"
 # GRPC 服务配置
 grpc:
   Name: "auth"
-  Addr: "localhost:9000"
+  Addr: "auth-service:9000"
   Version: "1.0"
   Weight: 1
 etcd:
   Name: "etcd"
   Addrs:
-    - "localhost:2379"
+    - "etcd:2379"
 # 数据库配置
 redis:
-  Host: "8.130.84.188:6379"
+  Host: "redis:6379"
   Password: ""
   Db: 0
 mysql:

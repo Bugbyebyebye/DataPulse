@@ -1,24 +1,20 @@
 package client
 
 import (
-	authgrpc "commons/api/auth/gen"
-	"commons/config"
-	"commons/config/etcd"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/resolver"
+	"commons/result"
+	"context"
+	"github.com/carlmjohnson/requests"
 	"log"
 )
 
-var AuthClient authgrpc.TokenServiceClient
-
-func InitAuthClient() {
-	etcdRegister := etcd.NewResolver(config.Conf.ETCD.Addrs)
-	resolver.Register(etcdRegister)
-
-	authConn, err := grpc.Dial("etcd:///auth", grpc.WithTransportCredentials(insecure.NewCredentials()))
+// VerifyToken 校验token
+func VerifyToken(ctx context.Context, token string) (*result.Result, error) {
+	r := &result.Result{}
+	err := requests.URL("http://auth-service:8081").Path("/verify").BodyJSON(token).ToJSON(&r).Fetch(ctx)
 	if err != nil {
-		log.Fatalf("could not connect: err => %s", err)
+		log.Printf("err => %s", err)
+		return nil, err
 	}
-	AuthClient = authgrpc.NewTokenServiceClient(authConn)
+	log.Printf("result => %+v", r)
+	return r, nil
 }

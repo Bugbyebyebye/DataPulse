@@ -1,21 +1,65 @@
 package config
 
+import (
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"log"
+)
+
 //store-service 服务自己的配置
 //数据库配置等
 
-import (
-	"context"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"time"
+var (
+	System     *gorm.DB
+	Warehouse  *gorm.DB
+	Warehouse2 *gorm.DB
+	err        error
 )
 
-// Cache redis 配置
-type Cache interface {
-	Put(ctx context.Context, key, value string, expire time.Duration) error
-	Get(ctx context.Context, key string) (string, error)
+func init() {
+	//系统数据库
+	System, err = gorm.Open(mysql.Open("root:maojiukeai1412@tcp(222.186.50.126:20134)/df_system?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	if err != nil {
+		log.Printf("mysql error => %s", err)
+	}
+	if System.Error != nil {
+		log.Printf("System error => %s", System.Error)
+	}
+
+	//数据仓库 数据库
+	Warehouse, err = gorm.Open(mysql.Open("root:maojiukeai1412@tcp(222.186.50.126:20134)/df_warehouse?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	if err != nil {
+		log.Printf("mysql error => %s", err)
+	}
+	if Warehouse.Error != nil {
+		log.Printf("Warehouse error => %s", Warehouse.Error)
+	}
+
+	Warehouse2, err = gorm.Open(mysql.Open("root:maojiukeai1412@tcp(222.186.50.126:20134)/df_warehouse2?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	if err != nil {
+		log.Printf("mysql error => %s", err)
+	}
+	if Warehouse2.Error != nil {
+		log.Printf("Warehouse2 error => %s", Warehouse2.Error)
+	}
 }
 
-// Mysqldb mysql 配置
-const (
-	Mysqldb = "root:maojiukeai1412@tcp(222.186.50.126:20134)/df_warehouse?charset=utf8"
-)
+// GetDbByDatabaseName 根据数据库名 获取数据库操作指针
+func GetDbByDatabaseName(databaseName string) *gorm.DB {
+	if databaseName == "df_warehouse" {
+		return Warehouse
+	} else if databaseName == "df_warehouse2" {
+		return Warehouse2
+	}
+	return nil
+}
+
+// QueryColumnData 传入字段值获取字段数据
+func QueryColumnData(db *gorm.DB, tableName string, columnList []string) []map[string]interface{} {
+	var data []map[string]interface{}
+	err := db.Table(tableName).Select(columnList).Find(&data).Error
+	if err != nil {
+		log.Printf("mysql error => %s", err)
+	}
+	return data
+}

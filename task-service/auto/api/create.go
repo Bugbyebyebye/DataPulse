@@ -80,28 +80,74 @@ func CreateAPi(portStr string, pathStr string, funcName string) {
 	fmt.Println(string(out))
 }
 
-func RunDocker(portStr string, funcName string) {
-	// 设置环境变量
-	setEnv("Host", "222.186.50.126")
-	setEnv("Port", "20134")
-	setEnv("Username", "root")
-	setEnv("Password", "maojiukeai1412")
-	setEnv("Database", "df_system")
-	setEnv("ServerPort", portStr)
-	portMapping := portStr + ":" + portStr
-
+func RunDocker(portStr, namestr string) (error error, serverurl string) {
+	setEnv("MYSQL_HOST", "222.186.50.126:20010")
+	setEnv("USERNAME", "sora")
+	setEnv("MYSQL_NAME", "root")
+	setEnv("MYSQL_PASSWORD", "maojiukeai1412")
+	setEnv("PORT", portStr)
 	// 构建 Docker 命令
-	cmd := exec.Command("podman", "run", "--env", "Port", "--env", "Host", "--env", "Username", "--env", "Password", "--env", "Database", "--env", "ServerPort", "-p", portMapping, "autodocker")
+	cmd := exec.Command("docker", "run",
+		"--env", fmt.Sprintf("MYSQL_HOST=%s", "222.186.50.126:20010"),
+		"--env", fmt.Sprintf("MYSQL_NAME=%s", "root"),
+		"--env", fmt.Sprintf("USERNAME=%s", "sora"),
+		"--env", fmt.Sprintf("MYSQL_PASSWORD=%s", "maojiukeai1412"),
+		"--network", "datapulse_default",
+		"--label", fmt.Sprintf("traefik.enable=true"),
+		"--label", fmt.Sprintf("traefik.http.routers.%s.rule=Host(`%s.emotionalbug.top`)", namestr, namestr),
+		"--label", fmt.Sprintf("traefik.http.routers.%s.service=%s", namestr, namestr),
+		"--label", fmt.Sprintf("traefik.http.routers.%s.entrypoints=https", namestr),
+		"--label", fmt.Sprintf("traefik.http.services.%s.loadbalancer.server.port=8080", namestr),
+		"--label", fmt.Sprintf("traefik.http.routers.%s.tls=true", namestr),
+		"--label", fmt.Sprintf("traefik.http.routers.%s.tls.certresolver=myCertResolver", namestr),
+		"--label", fmt.Sprintf("traefik.http.services.%s.loadbalancer.passhostheader=true", namestr),
+		"autodocker")
+	fmt.Println(cmd)
 
 	// 执行 Docker 命令
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("Error running Docker command:", err)
-		return
+		fmt.Println("启动服务失败，报错为:", err)
+		return err, ""
 	}
 
+	//todo 实现将生成的链接/容器名存在数据库中
 	// 打印命令输出
 	fmt.Println(string(output))
+	serverstr := fmt.Sprintf("%s.emotionalbug.top", namestr)
+	return nil, serverstr
+}
+
+func StopDocker(name string) []byte {
+	// 构建 Docker 命令
+	cmd := exec.Command(
+		"docker", "stop", fmt.Sprintf("%s", name),
+		"&&",
+		"docker", "rm", fmt.Sprintf("%s", name))
+	fmt.Println(cmd)
+
+	// 执行 Docker 命令
+	err, _ := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("删除失败:", err)
+		return err
+	}
+	return nil
+}
+
+func RestartDocker(name string) []byte {
+	// 构建 Docker 命令
+	cmd := exec.Command(
+		"docker", "restart", fmt.Sprintf("%s", name))
+	fmt.Println(cmd)
+
+	// 执行 Docker 命令
+	err, _ := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("重启失败:", err)
+		return err
+	}
+	return nil
 }
 
 func setEnv(key, value string) {

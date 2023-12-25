@@ -1,38 +1,59 @@
 package dao
 
-import "fmt"
+import (
+	"commons/util"
+	"fmt"
+	"gorm.io/gorm"
+	"log"
+	"strings"
+)
 
-func CreateTableBySQL(tableName string, columns []string) {
+//创建数据表的相关函数
+
+// CreateTableBySQL 通过表名和字段列表创建表
+func CreateTableBySQL(db *gorm.DB, tableName string, columns []string) {
+	log.Printf("createTableBySQL => tableName %s columns => %s", tableName, columns)
 	var createTableSQL string
 	createTableSQL = fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s INT AUTO_INCREMENT PRIMARY KEY", tableName, "id")
 	for _, column := range columns {
-		createTableSQL += fmt.Sprintf(", %s VARCHAR(255) NOT NULL", column)
+		if column[len(column)-2:] == "id" || column == "state" {
+			createTableSQL += fmt.Sprintf(", %s INT ", column)
+		} else if len(column) > 4 && column[len(column)-4:] == "time" {
+			createTableSQL += fmt.Sprintf(", %s BIGINT(11) ", column)
+		} else {
+			createTableSQL += fmt.Sprintf(", %s VARCHAR(255) ", column)
+		}
 	}
-
 	createTableSQL += ");"
+	db.Exec(createTableSQL)
 
-	Warehouse.Exec(createTableSQL)
-
-	fmt.Println("Table created successfully.")
+	fmt.Println("数据表创建成功")
 }
 
-func AlertTableBySQL(tableName string, columns []string) {
-
+// AlertTableBySQL 向已经存在的表中追加字段
+func AlertTableBySQL(db *gorm.DB, tableName string, columns []string) {
+	log.Printf("tableName => %s columns => %s", tableName, columns)
 	var alterTableSQL string
-	for i, column := range columns {
-		if i == 0 {
-			continue // 跳过第一个元素（主键）
+	var columnSQL []string
+	columnExists := GetAllColumnName(tableName, db)
+	for _, column := range columns {
+		if util.In(column, columnExists) {
+			continue
 		}
-		if i == 1 {
-			alterTableSQL += fmt.Sprintf(" ADD COLUMN %s VARCHAR(255) NOT NULL", column)
+		if column[len(column)-2:] == "id" || column == "state" {
+			columnSQL = append(columnSQL, fmt.Sprintf("ADD COLUMN %s INT", column))
+		} else if column[len(column)-4:] == "time" {
+			columnSQL = append(columnSQL, fmt.Sprintf("ADD COLUMN %s BIGINT(11)", column))
 		} else {
-			alterTableSQL += fmt.Sprintf(", %s VARCHAR(255) NOT NULL", column)
+			columnSQL = append(columnSQL, fmt.Sprintf("ADD COLUMN %s VARCHAR(255)", column))
 		}
 	}
+	alterTableSQL = strings.Join(columnSQL, ",")
 
 	alterTableSQL = fmt.Sprintf("ALTER TABLE %s %s;", tableName, alterTableSQL)
+	log.Printf("alterTableSQL => %s", alterTableSQL)
 
-	Warehouse.Exec(alterTableSQL)
+	db.Exec(alterTableSQL)
 
-	fmt.Println("Table altered successfully.")
+	fmt.Println("数据表字段追加成功")
 }

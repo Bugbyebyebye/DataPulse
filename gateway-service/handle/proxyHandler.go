@@ -1,36 +1,28 @@
 package handle
 
 import (
-	auth "commons/api/auth/gen"
 	"commons/result"
-	"encoding/json"
-	"errors"
 	"gateway-service/client"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
 // 转发服务地址
 var hosts = map[string]string{
-	"auth":  "localhost:8081",
-	"log":   "localhost:8082",
-	"store": "localhost:8083",
-	"task":  "localhost:8084",
+	"auth":  "auth-service:8081",
+	"log":   "log-service:8082",
+	"store": "store-service:8083",
+	"task":  "task-service:8084",
 }
 
 // 允许跳过鉴权
 var admits = map[string]string{
-	"auth": "localhost:8081",
-}
-
-type Info struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
+	"auth": "auth-service:8081",
 }
 
 func ProxyHandler(ctx *gin.Context) {
@@ -44,31 +36,30 @@ func ProxyHandler(ctx *gin.Context) {
 		token := ctx.Request.Header.Get("token")
 		//log.Printf("token => %s", token)
 
-		res, err := client.AuthClient.VerifyToken(ctx, &auth.Req{Token: token})
+		res, err := client.VerifyToken(ctx, token)
 		if err != nil {
 			//鉴权失败
 			log.Printf("err => %s", err)
-			if errors.Is(err, jwt.ErrInvalidKey) {
-				ctx.JSON(http.StatusOK, r.Fail(400, "token 无效！"))
-				return
-			} else if errors.Is(err, jwt.ErrTokenExpired) {
-				ctx.JSON(http.StatusOK, r.Fail(400, "token 过期！"))
-				return
-			}
 		}
 		//鉴权成功
-		//log.Printf("res => %s", res)
-		v := Info{}
-		err = json.Unmarshal(res.Info, &v)
-		if err != nil {
-			ctx.JSON(http.StatusOK, r.Fail(400, "用户JSON数据解析错误！"))
+		log.Printf("res => %+v", res)
+		code := res.Code
+		if code == 4001 {
+			log.Printf("token 无效")
+			ctx.JSON(http.StatusOK, r.Fail(4001, "token 无效"))
+			return
+		} else if code == 4002 {
+			log.Printf("token 过期")
+			ctx.JSON(http.StatusOK, r.Fail(4002, "token 过期"))
 			return
 		}
 
-		log.Printf("用户 Id:%v Username:%s 登录数据中台", v.Id, v.Username)
-		ctx.Set("id", v.Id)
-		ctx.Set("username", v.Username)
-		//ctx.JSON(200, "成功")
+		data := res.Data.(map[string]interface{})
+		log.Printf("用户 Id:%v Username:%s 访问数据中台", data["id"], data["username"])
+		ctx.Request.Header.Set("id", strconv.Itoa(int(data["id"].(float64))))
+		ctx.Request.Header.Set("username", data["username"].(string))
+		ctx.Request.Header.Set("role", data["role"].(string))
+		ctx.Request.Header.Set("authority", strconv.Itoa(int(data["authority"].(float64))))
 	}
 
 	//请求放行

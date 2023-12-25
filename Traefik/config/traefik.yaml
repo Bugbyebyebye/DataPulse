@@ -1,0 +1,52 @@
+api:
+  # 开启 WEB UI
+  dashboard: true
+  # 安全模式
+  insecure: true
+
+
+# 发现docker或者file文件中定义的服务
+providers:
+  # 监听file
+  file:
+    # 定义动态配置文件所在的文件目录(容器内部路径)
+    directory: /etc/traefik/config
+    # 监听动态配置文件的变更
+    watch: true
+
+
+  # 监听docker
+  docker:
+    # 如果置为false，那么docker容器需要在labels中声明traefik.enable=true，否则容器会被忽略
+    exposedByDefault: false
+
+
+# 定义流量入口(也就是对外暴露的监听的端口，该处定义的端口需要在docker-compose.yml中做端口暴露映射)
+entryPoints:
+  # 定义一个名称为http的入口，监听80端口，由80端口进入的流量都由它来代理
+  http:
+    address: ":80"
+
+  # 定义https入口，监听443端口，由80端口进入的流量都由它来代理
+  https:
+    address: ":443"
+
+  # mysql的tcp代理入口
+  mysql:
+    address: ":3306"
+
+  # redis的tcp代理入口
+  redis:
+    address: ":6379"
+
+# 开启ACME 自动生成HTTPS证书
+certificatesResolvers:
+  myCertResolver:
+    acme:
+      # 邮箱地址
+      email: "ssl@resoras.com"
+      # 签发的https证书存放位置
+      storage: "/letsencrypt/acme.json"
+      # 自动签发证书的一种验证方式(还有tlsChallent、dnsChallenge,我们用的是常用的这种httpChallenge方式)
+      httpChallenge:
+        entryPoint: http

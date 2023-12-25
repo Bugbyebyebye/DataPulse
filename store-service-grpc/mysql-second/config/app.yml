@@ -1,4 +1,4 @@
 # Gin web服务配置
 server:
   Name: "mysql-second"
-  Addr: "localhost:8086"
+  Addr: "0.0.0.0:8086"

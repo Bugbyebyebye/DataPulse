@@ -1,0 +1,61 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - pro-docker  # 可以根据你的需求更改触发条件
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest  # 使用 Ubuntu 系统环境
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # 检出代码
+
+      - name: Login Registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: "差点就睡着了"
+          password: "maojiukeai1412"
+
+#      - name: Build and push auth-service
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service -f Dockerfile.auth-service .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service
+#
+#      - name: Build and push gateway-service
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service -f Dockerfile.gateway-service .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service
+#
+#      - name: Build and push log-service
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/log-service -f Dockerfile.log-service .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/log-service
+#
+#      - name: Build and push task-service
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/task-service -f Dockerfile.task-service .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/task-service
+#
+      - name: Build and push store-service
+        run: |
+          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/store-service -f Dockerfile.store-service .
+          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/store-service
+
+#      - name: Build and push mysql-second
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-second -f Dockerfile.mysql-second .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-second
+#
+#      - name: Build and push mysql-first
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-first -f Dockerfile.mysql-first .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-first
+#
+#      - name: Build and push mongodb-first
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first -f Dockerfile.mongodb-first .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first

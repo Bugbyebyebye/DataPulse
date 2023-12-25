@@ -2,25 +2,38 @@ package handle
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
+	"mysql-first/common"
 	"mysql-first/dao"
-	"mysql-second/service"
+	"mysql-first/service"
 	"net/http"
 )
 
 // GetAllColumnNameList 获取mysql1数据库中的所有字段名
 func (*StoreHandle) GetAllColumnNameList(ctx *gin.Context) {
+	var result []common.Table
+	education := service.GetColumnNameList(dao.Education, "df_education")
 
-	var databaseList []service.Database
-	var database service.Database
-	education := service.GetColumnNameList(dao.Education)
-	database.DatabaseName = "df_education"
-	database.TableList = education
-	databaseList = append(databaseList, database)
+	library := service.GetColumnNameList(dao.Library, "df_library")
 
-	library := service.GetColumnNameList(dao.Library)
-	database.DatabaseName = "df_library"
-	database.TableList = library
-	databaseList = append(databaseList, database)
+	result = append(education, library...)
+	ctx.JSON(http.StatusOK, result)
+}
 
-	ctx.JSON(http.StatusOK, databaseList)
+type Result struct {
+	Data []map[string]string
+}
+
+// GetColumnData 根据字段名获取数据
+func (*StoreHandle) GetColumnData(ctx *gin.Context) {
+	var table common.Table
+
+	err := ctx.BindJSON(&table)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	log.Printf("tableList => %+v", table)
+	list := service.GetDataByColumnList(table)
+
+	ctx.JSON(http.StatusOK, list)
 }
