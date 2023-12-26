@@ -1,4 +1,5 @@
 # DataPulse 数据中台
+- 该分支已归档，所有功能将移交主[dev](https://github.com/Bugbyebyebye/DataPulse/tree/dev)分支
 ### 文件结构&业务功能
 * common 存放公共配置
 * gateway-service 
