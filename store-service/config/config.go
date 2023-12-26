@@ -1,9 +1,12 @@
 package config
 
 import (
+	"fmt"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 //store-service 服务自己的配置
@@ -13,8 +16,24 @@ var (
 	System     *gorm.DB
 	Warehouse  *gorm.DB
 	Warehouse2 *gorm.DB
+	Conf       = InitConfig()
 	err        error
 )
+
+type Config struct {
+	SEVERURL *SeverUrlConfig
+}
+
+// SeverUrlConfig 服务地址配置
+type SeverUrlConfig struct {
+	AuthUrl  string
+	LogsUrl  string
+	TaskUrl  string
+	StoreUrl string
+	MYSQLF   string
+	MYSQLS   string
+	MongoDB  string
+}
 
 func init() {
 	//系统数据库
@@ -41,6 +60,24 @@ func init() {
 	}
 	if Warehouse2.Error != nil {
 		log.Printf("Warehouse2 error => %s", Warehouse2.Error)
+	}
+}
+
+// InitConfig 获取yml配置初始化
+func InitConfig() *Config {
+	c := &Config{}
+	// 尝试从 .env 文件加载环境变量
+	if err := godotenv.Load(); err != nil {
+		fmt.Println("没有.env文件，尝试从系统环境变量中获取")
+	}
+	c.ReaderServerConfigEnv()
+	return c
+}
+func (c *Config) ReaderServerConfigEnv() {
+	c.SEVERURL = &SeverUrlConfig{
+		MYSQLF:  os.Getenv("MYSQLF"),
+		MYSQLS:  os.Getenv("MYSQLS"),
+		MongoDB: os.Getenv("MONGODB"),
 	}
 }
 

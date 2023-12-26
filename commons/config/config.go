@@ -15,14 +15,27 @@ var (
 )
 
 type Config struct {
-	viper   *viper.Viper
-	SC      *ServerConfig
-	RC      *RedisConfig
-	MC      *MysqlConfig
-	GRPC    *GrpcConfig
-	ETCD    *EtcdConfig
-	SMTP    *SmtpConfig
-	WEBHOOK *SendWebHook
+	viper    *viper.Viper
+	SC       *ServerConfig
+	RC       *RedisConfig
+	MC       *MysqlConfig
+	GRPC     *GrpcConfig
+	ETCD     *EtcdConfig
+	SMTP     *SmtpConfig
+	WEBHOOK  *SendWebHook
+	SEVERURL *SeverUrlConfig
+}
+
+// SeverUrlConfig 服务地址配置
+type SeverUrlConfig struct {
+	AuthUrl  string
+	LogsUrl  string
+	TaskUrl  string
+	StoreUrl string
+	AuthHttp string
+	MYSQLF   string
+	MYSQLS   string
+	MongoDB  string
 }
 
 // ServerConfig 服务器配置
@@ -74,12 +87,10 @@ type SendWebHook struct {
 // InitConfig 获取yml配置初始化
 func InitConfig() *Config {
 	c := &Config{}
-
 	// 尝试从 .env 文件加载环境变量
 	if err := godotenv.Load(); err != nil {
 		fmt.Println("没有.env文件，尝试从系统环境变量中获取")
 	}
-
 	c.ReaderServerConfigEnv()
 	return c
 }
@@ -130,6 +141,16 @@ func (c *Config) ReaderServerConfigEnv() {
 	c.SC = &ServerConfig{
 		Name: os.Getenv("SERVERNAME"),
 		Addr: os.Getenv("SERVERADDR"),
+	}
+	c.SEVERURL = &SeverUrlConfig{
+		AuthUrl:  os.Getenv("AUTHURL"),
+		LogsUrl:  os.Getenv("LOGURL"),
+		TaskUrl:  os.Getenv("STOREURL"),
+		StoreUrl: os.Getenv("TASKURL"),
+		MYSQLF:   os.Getenv("MYSQLF"),
+		MYSQLS:   os.Getenv("MYSQLS"),
+		MongoDB:  os.Getenv("MONGODB"),
+		AuthHttp: os.Getenv("AUTHHTTP"),
 	}
 	//c.GRPC = &GrpcConfig{
 	//	Name:    os.Getenv("GRPCNAME"),
