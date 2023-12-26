@@ -132,6 +132,9 @@ services:
       - MYSQLPASSWORD=maojiukeai1412
       - SERVERNAME=task-service
       - SERVERADDR=task-service:8084
+      - redisHost=redis:6379
+      - redisPassword=
+      - redisDb=0
 #    labels:
 #      - "traefik.enable=true"
 #      - "traefik.http.routers.datapulse.rule=Host(`task.emotionalbug.top`)"
@@ -159,6 +162,9 @@ services:
       - MYSQLF=http://mysql-first:8085
       - MYSQLS=http://mysql-second:8086
       - MONGODB=http://mongodb-first:8087
+      - redisHost=redis:6379
+      - redisPassword=
+      - redisDb=0
 
   mongodb-first:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first:latest
@@ -169,6 +175,9 @@ services:
     environment:
       - SERVERNAME=mongodb-first
       - SERVERADDR=0.0.0.0:8087
+      - redisHost=redis:6379
+      - redisPassword=
+      - redisDb=0
 
   mysql-first:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-first:latest
@@ -179,6 +188,9 @@ services:
     environment:
       - SERVERNAME=mysql-first
       - SERVERADDR=0.0.0.0:8085
+      - redisHost=redis:6379
+      - redisPassword=
+      - redisDb=0
 
   mysql-second:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-second:latest
@@ -189,6 +201,9 @@ services:
     environment:
       - SERVERNAME=mysql-second
       - SERVERADDR=0.0.0.0:8086
+      - redisHost=redis:6379
+      - redisPassword=
+      - redisDb=0
 
   redis:
     restart: always
