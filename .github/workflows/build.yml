@@ -3,7 +3,7 @@ name: Build and Push Docker Images
 on:
   push:
     branches:
-      - pro-docker  # 可以根据你的需求更改触发条件
+      - dev  # 可以根据你的需求更改触发条件
 
 jobs:
   build-and-push:
@@ -55,7 +55,7 @@ jobs:
 #          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-first -f Dockerfile.mysql-first .
 #          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-first
 #
-      - name: Build and push mongodb-first
-        run: |
-          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first -f Dockerfile.mongodb-first .
-          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first
+#      - name: Build and push mongodb-first
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first -f Dockerfile.mongodb-first .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first
