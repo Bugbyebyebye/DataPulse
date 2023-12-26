@@ -76,3 +76,17 @@ func GetTableInfo(tableId int) (map[string]interface{}, error) {
 	err := config.System.Model(tableInfo).Where("table_id = ?", tableId).Find(&result).Error
 	return result, err
 }
+
+// GetPublicTableNum 获取公共数据表数量
+func GetPublicTableNum() (int64, error) {
+	var count int64
+	err := config.System.Model(TableInfo{}).Where("table_type = ?", 0).Count(&count).Error
+	return count, err
+}
+
+// GetPersonalTableNum 获取个人数据表数量
+func GetPersonalTableNum(tableId int) (int64, error) {
+	var count int64
+	err := config.System.Model(TableInfo{}).Where("table_id = ? and table_type = ?", tableId, 1).Count(&count).Error
+	return count, err
+}

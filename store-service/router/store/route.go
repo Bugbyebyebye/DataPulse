@@ -10,6 +10,9 @@ type StoreRouter struct {
 
 func (*StoreRouter) Route(r *gin.Engine) {
 	store := handle.New()
+
+	//获取首页统计数据
+	r.GET("/getNum", store.GetIndexTableData)
 	//获取数据库信息
 	//获取底层数据库信息
 	r.GET("/getInfo", store.GetBottomDatabaseNameList)

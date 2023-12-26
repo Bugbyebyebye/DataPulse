@@ -101,3 +101,47 @@ func (*StoreHandle) GetWarehouseDatabaseNameList(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, res.Success(targetList))
 }
+
+type IndexData struct {
+	DatabaseNum     int `json:"database_num"`
+	PublicTableNum  int `json:"public_table_num"`
+	PrivateTableNum int `json:"private_table_num"`
+	ApiTotalNum     int `json:"api_total_num"`
+	ApiWarningNum   int `json:"api_warning_num"`
+	TaskTotalNum    int `json:"task_total_num"`
+}
+
+// GetIndexTableData 获取首页需要的统计数据
+func (*StoreHandle) GetIndexTableData(ctx *gin.Context) {
+	idStr := ctx.Request.Header.Get("id")
+	id, _ := strconv.Atoi(idStr)
+
+	//获取数据表数据
+	//公共表
+	publicTableNum, err := model.GetPublicTableNum()
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	//私有表
+	var privateTableNum int
+	list, err := model.GetTableIdList(id)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	for _, v := range list {
+		num, err := model.GetPersonalTableNum(v)
+		if err != nil {
+			log.Printf("err => %s", err)
+		}
+		privateTableNum += int(num)
+	}
+
+	var data IndexData
+	data.DatabaseNum = 2
+	data.PublicTableNum = int(publicTableNum)
+	data.PrivateTableNum = privateTableNum
+	data.ApiTotalNum = 0
+	data.ApiWarningNum = 0
+	data.TaskTotalNum = 0
+	ctx.JSON(http.StatusOK, res.Success(data))
+}
