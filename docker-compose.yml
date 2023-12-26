@@ -2,49 +2,44 @@ version: '2'
 
 services:
   # 登录 Docker Hub 的服务
-#  login-service:
-#    image: alpine
-#    command: echo "Logging in to Docker Hub"
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    environment:
-#      - DOCKER_USERNAME="差点就睡着了"
-#      - DOCKER_PASSWORD="maojiukeai1412"
-#    depends_on:
-#      - my_service  # 这里使用的服务名称需要根据实际情况调整
-#    entrypoint: sh -c 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-# 反向代理
-#  traefik:
-#    image: traefik
-#    command: --api.insecure=true --providers.docker
-#    restart: always
-#    container_name: traefik
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '0.5'
-#          memory: '2048M'
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#      - ./Traefik/config:/etc/traefik
-#      - ./Traefik/logs:/etc/traefik/config
-#      - ./Traefik/letsencrypt:/letsencrypt
-
-  etcd:
-    image: 'bitnami/etcd:latest'
-    container_name: etcd
-    environment:
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-# 生产环境不端口，测试可取消注释
-#    ports:
-#      - "2379:2379"
-#      - "2380:2380"
+  #  login-service:
+  #    image: alpine
+  #    command: echo "Logging in to Docker Hub"
+  #    volumes:
+  #      - /var/run/docker.sock:/var/run/docker.sock
+  #    environment:
+  #      - DOCKER_USERNAME="差点就睡着了"
+  #      - DOCKER_PASSWORD="maojiukeai1412"
+  #    depends_on:
+  #      - my_service  # 这里使用的服务名称需要根据实际情况调整
+  #    entrypoint: sh -c 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+  # 反向代理
+  traefik:
+    image: traefik
+    command: --api.insecure=true --providers.docker
+    restart: always
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./etcd_data:/bitnami/etcd
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./Traefik/config:/etc/traefik
+      - ./Traefik/logs:/etc/traefik/config
+      - ./Traefik/letsencrypt:/letsencrypt
+
+#  etcd:
+#    image: 'bitnami/etcd:latest'
+#    container_name: etcd
+#    environment:
+#      - ALLOW_NONE_AUTHENTICATION=yes
+#      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+#    # 生产环境不端口，测试可取消注释
+#    #    ports:
+#    #      - "2379:2379"
+#    #      - "2380:2380"
+#    volumes:
+#      - ./etcd_data:/bitnami/etcd
 
   auth-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/auth-service:latest
@@ -52,6 +47,36 @@ services:
     depends_on:
       - etcd
       - redis
+    environment:
+      - SendUrl=
+      - smtpHost=smtp.fastmail.com
+      - smtpUsername=sora@resoras.com
+      - smtpPassword=uysx8mlv49nnhcwk
+      - smtpFromname=notifications@sent.com
+      - MYSQLHOST=222.186.50.126:20134
+      - MYSQLNAME=root
+      - MYSQLPASSWORD=maojiukeai1412
+      - redisHost=redis:6379
+      - redisPassword=
+      - redisDb=0
+      - SERVERNAME=auth-service
+      - SERVERADDR=auth-service:8081
+      - GRPCNAME=auth
+      - GRPCADDR=auth-service:9000
+      - GRPCVERSION=1.0
+
+  datapulse-web:
+    image: registry.cn-hangzhou.aliyuncs.com/dockercns/datapluseweb
+    container_name: datapilse-web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.datapulseweb.rule=Host(`datapulseweb.emotionalbug.top`)"
+      - "traefik.http.routers.datapulseweb.service=datapulseweb"
+      - "traefik.http.routers.datapulseweb.entrypoints=https"
+      - "traefik.http.services.datapulseweb.loadbalancer.server.port=80"
+      - "traefik.http.routers.datapulseweb.tls=true"
+      - "traefik.http.routers.datapulseweb.tls.certresolver=myCertResolver"
+      - "traefik.http.services.datapulseweb.loadbalancer.passhostheader=true"
 
   gateway-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/gateway-service:latest
@@ -61,15 +86,23 @@ services:
       - redis
     ports:
       - "8080:8080"
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.datapulseapi.rule=Host(`api.example.com`)"
-#      - "traefik.http.routers.datapulseapi.service=datapulseapi"
-#      - "traefik.http.routers.datapulseapi.entrypoints=https"
-#      - "traefik.http.services.datapulseapi.loadbalancer.server.port=8080"
-#      - "traefik.http.routers.datapulseapi.tls=true"
-#      - "traefik.http.routers.datapulseapi.tls.certresolver=myCertResolver"
-#      - "traefik.http.services.datapulseapi.loadbalancer.passhostheader=true"
+    environment:
+      - SERVERNAME=gateway-service
+      - SERVERADDR=gateway-service:8080
+      - AUTHURL=auth-service:8081
+      - LOGURL=log-service:8082
+      - STOREURL=store-service:8083
+      - TASKURL=task-service:8084
+      - AUTHHTTP=http://auth-service:8081
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.datapulseapi.rule=Host(`datapulseapi.emotionalbug.top`)"
+      - "traefik.http.routers.datapulseapi.service=datapulseapi"
+      - "traefik.http.routers.datapulseapi.entrypoints=https"
+      - "traefik.http.services.datapulseapi.loadbalancer.server.port=8080"
+      - "traefik.http.routers.datapulseapi.tls=true"
+      - "traefik.http.routers.datapulseapi.tls.certresolver=myCertResolver"
+      - "traefik.http.services.datapulseapi.loadbalancer.passhostheader=true"
 
   log-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/log-service:latest
@@ -77,6 +110,15 @@ services:
     depends_on:
       - etcd
       - redis
+    environment:
+      - SERVERNAME=log-service
+      - SERVERADDR=log-service:8082
+      - MYSQLHOST=222.186.50.126:20134
+      - MYSQLNAME=root
+      - MYSQLPASSWORD=maojiukeai1412
+      - redisHost=redis:6379
+      - redisPassword=
+      - redisDb=0
 
   task-service:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/task-service:latest
@@ -84,6 +126,21 @@ services:
     depends_on:
       - etcd
       - redis
+    environment:
+      - MYSQLHOST=222.186.50.126:20134
+      - MYSQLNAME=root
+      - MYSQLPASSWORD=maojiukeai1412
+      - SERVERNAME=task-service
+      - SERVERADDR=task-service:8084
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.datapulse.rule=Host(`task.emotionalbug.top`)"
+#      - "traefik.http.routers.datapulse.service=datapulse"
+#      - "traefik.http.routers.datapulse.entrypoints=https"
+#      - "traefik.http.services.datapulse.loadbalancer.server.port=8084"
+#      - "traefik.http.routers.datapulse.tls=true"
+#      - "traefik.http.routers.datapulse.tls.certresolver=myCertResolver"
+#      - "traefik.http.services.datapulse.loadbalancer.passhostheader=true"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -93,6 +150,15 @@ services:
     depends_on:
       - etcd
       - redis
+    environment:
+      - MYSQLHOST=222.186.50.126:20134
+      - MYSQLNAME=root
+      - MYSQLPASSWORD=maojiukeai1412
+      - SERVERNAME=store-service
+      - SERVERADDR=store-service:8083
+      - MYSQLF=http://mysql-first:8085
+      - MYSQLS=http://mysql-second:8086
+      - MONGODB=http://mongodb-first:8087
 
   mongodb-first:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/mongodb-first:latest
@@ -100,6 +166,9 @@ services:
     depends_on:
       - etcd
       - redis
+    environment:
+      - SERVERNAME=mongodb-first
+      - SERVERADDR=0.0.0.0:8087
 
   mysql-first:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-first:latest
@@ -107,6 +176,9 @@ services:
     depends_on:
       - etcd
       - redis
+    environment:
+      - SERVERNAME=mysql-first
+      - SERVERADDR=0.0.0.0:8085
 
   mysql-second:
     image: registry.cn-hangzhou.aliyuncs.com/dockercns/mysql-second:latest
@@ -114,14 +186,17 @@ services:
     depends_on:
       - etcd
       - redis
+    environment:
+      - SERVERNAME=mysql-second
+      - SERVERADDR=0.0.0.0:8086
 
   redis:
     restart: always
     image: redis
     container_name: redis
-# 生产环境不端口，测试可取消注释
-#    ports:
-#      - "6379:6379"
+  # 生产环境不端口，测试可取消注释
+  #    ports:
+  #      - "6379:6379"
 
   dockerupdate:
     image: containrrr/watchtower

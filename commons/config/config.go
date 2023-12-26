@@ -145,8 +145,8 @@ func (c *Config) ReaderServerConfigEnv() {
 	c.SEVERURL = &SeverUrlConfig{
 		AuthUrl:  os.Getenv("AUTHURL"),
 		LogsUrl:  os.Getenv("LOGURL"),
-		TaskUrl:  os.Getenv("STOREURL"),
-		StoreUrl: os.Getenv("TASKURL"),
+		StoreUrl: os.Getenv("STOREURL"),
+		TaskUrl:  os.Getenv("TASKURL"),
 		MYSQLF:   os.Getenv("MYSQLF"),
 		MYSQLS:   os.Getenv("MYSQLS"),
 		MongoDB:  os.Getenv("MONGODB"),
