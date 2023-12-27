@@ -25,8 +25,8 @@ const Filepath = "./images"
 
 // QinuConfig 七牛云配置
 var QinuConfig = map[string]string{
-	"AccessKey": "bae19QgDWC33GFhS5GQvGJxZbuw1SL5w8Ymt_mIF",
-	"SecretKey": "Vkp-7V8xAR6EoRVSPmhc2TtSlD3pzP6NA9ZrqMP0",
+	"AccessKey": "89VRcOeJLPI3HAuf_lbdT0qU6KrazC7_KdtCZsxT",
+	"SecretKey": "UBMz3-03Cw-z-qkIfbMqbvFygbP_72nZCCodlSkg",
 	"Bucket":    "hjbsport",
 	"Url":       "cdn.emotionalbug.top",
 }
