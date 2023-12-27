@@ -1,6 +1,7 @@
 package client
 
 import (
+	"commons/config"
 	"commons/result"
 	"context"
 	"github.com/carlmjohnson/requests"
@@ -10,7 +11,7 @@ import (
 // VerifyToken 校验token
 func VerifyToken(ctx context.Context, token string) (*result.Result, error) {
 	r := &result.Result{}
-	err := requests.URL("http://localhost:8081").Path("/verify").BodyJSON(token).ToJSON(&r).Fetch(ctx)
+	err := requests.URL(config.Conf.SEVERURL.AuthHttp).Path("/verify").BodyJSON(token).ToJSON(&r).Fetch(ctx)
 	if err != nil {
 		log.Printf("err => %s", err)
 		return nil, err

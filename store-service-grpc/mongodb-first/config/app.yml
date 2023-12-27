@@ -1,4 +1,4 @@
 # Gin web服务配置
 server:
   Name: "mongodb-first"
-  Addr: "localhost:8087"
+  Addr: "0.0.0.0:8087"

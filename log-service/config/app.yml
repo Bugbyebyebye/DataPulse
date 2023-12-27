@@ -1,10 +1,20 @@
 # Gin web服务配置
 server:
   Name: "log-service"
-  Addr: "localhost:8082"
+  Addr: "log-service:8082"
+# GRPC 服务配置
+grpc:
+  Name: "log"
+  Addr: "log-service:9001"
+  Version: "1.0"
+  Weight: 1
+etcd:
+  Name: "etcd"
+  Addrs:
+    - "etcd:2379"
 # 数据库配置
 redis:
-  Host: "localhost:6379"
+  Host: "redis:6379"
   Password: ""
   Db: 0
 mysql:

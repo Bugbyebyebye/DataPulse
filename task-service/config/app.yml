@@ -1,7 +1,12 @@
 # Gin web服务配置
 server:
   Name: "task-service"
-  Addr: "localhost:8084"
+  Addr: "task-service:8084"
+# GRPC 服务配置
+etcd:
+  Name: "etcd"
+  Addrs:
+    - "etcd:2379"
 # 数据库配置
 mysql:
   Host: "222.186.50.126:20134"

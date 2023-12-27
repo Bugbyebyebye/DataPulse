@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"commons/config"
 	"commons/result"
 	"gateway-service/client"
 	"github.com/gin-gonic/gin"
@@ -14,15 +15,15 @@ import (
 
 // 转发服务地址
 var hosts = map[string]string{
-	"auth":  "localhost:8081",
-	"log":   "localhost:8082",
-	"store": "localhost:8083",
-	"task":  "localhost:8084",
+	"auth":  config.Conf.SEVERURL.AuthUrl,
+	"log":   config.Conf.SEVERURL.LogsUrl,
+	"store": config.Conf.SEVERURL.StoreUrl,
+	"task":  config.Conf.SEVERURL.TaskUrl,
 }
 
 // 允许跳过鉴权
 var admits = map[string]string{
-	"auth": "localhost:8081",
+	"auth": config.Conf.SEVERURL.AuthUrl,
 }
 
 func ProxyHandler(ctx *gin.Context) {

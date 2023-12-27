@@ -83,7 +83,7 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 			bottom = dao.GetDataByColumnList(t)
 			//log.Printf("bottom => %+v\n", bottom)
 		} else if t.SourceName == "mysql1" {
-			err := requests.URL("http://localhost:8085").
+			err := requests.URL(config.Conf.SEVERURL.MYSQLF).
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).
@@ -93,7 +93,7 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 				log.Printf("err => %s", err)
 			}
 		} else if t.SourceName == "mysql2" {
-			err := requests.URL("http://localhost:8086").
+			err := requests.URL(config.Conf.SEVERURL.MYSQLS).
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).
@@ -103,7 +103,7 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 				log.Printf("err => %s", err)
 			}
 		} else if t.SourceName == "mongodb1" {
-			err := requests.URL("http://localhost:8087").
+			err := requests.URL(config.Conf.SEVERURL.MongoDB).
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).
@@ -156,7 +156,7 @@ func (*StoreHandle) AlertTable(ctx *gin.Context) {
 			bottom = dao.GetDataByColumnList(t)
 			//log.Printf("bottom => %+v\n", bottom)
 		} else if t.SourceName == "mysql1" {
-			err := requests.URL("http://localhost:8085").
+			err := requests.URL(config.Conf.SEVERURL.MYSQLF).
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).
@@ -166,7 +166,8 @@ func (*StoreHandle) AlertTable(ctx *gin.Context) {
 				log.Printf("err => %s", err)
 			}
 		} else if t.SourceName == "mysql2" {
-			err := requests.URL("http://localhost:8086").
+
+			err := requests.URL(config.Conf.SEVERURL.MYSQLS).
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).
@@ -176,7 +177,7 @@ func (*StoreHandle) AlertTable(ctx *gin.Context) {
 				log.Printf("err => %s", err)
 			}
 		} else if t.SourceName == "mongodb1" {
-			err := requests.URL("http://localhost:8087").
+			err := requests.URL(config.Conf.SEVERURL.MongoDB).
 				Path("/getColumnData").
 				BodyJSON(&t).
 				ToJSON(&bottom).

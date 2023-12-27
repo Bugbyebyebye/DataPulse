@@ -47,22 +47,6 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 		return
 	}
 	switch req["data_type"] {
-	case "loginlogs":
-		userName, ok := req["user_name"].(string)
-		if ok {
-			fmt.Println("断言成功")
-		} else {
-			// 处理类型断言失败的情况
-			fmt.Println("无法转换为 string 类型")
-			ctx.JSON(200, res.Fail(400, "断言失败username无法转换为 string 类型"))
-		}
-		err := model.RecordUserLoginLog(userName)
-		if err != nil {
-			fmt.Printf("将日志数据插入到数据库失败: %s\n", err.Error())
-			ctx.JSON(200, res.Fail(4001, "将日志数据插入到数据库失败"))
-			return
-		}
-		ctx.JSON(200, res.Success("日志记录成功"))
 	case "actionlogs":
 		userName, ok := req["user_name"].(string)
 		Content, ok := req["content"].(string)
@@ -87,6 +71,7 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 		userName, ok := req["user_name"].(string)
 		TaskName, ok := req["task_name"].(string)
 		Status, ok := req["status"].(string)
+		Takingtime, ok := req["taking_time"].(string)
 		if ok {
 			fmt.Println("断言成功")
 		} else {
@@ -95,7 +80,7 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 			ctx.JSON(200, res.Fail(400, "断言失败"))
 			return
 		}
-		err := model.RecordUserTackLog(userName, TaskName, Status)
+		err := model.RecordUserTackLog(userName, TaskName, Status, Takingtime)
 		if err != nil {
 			fmt.Printf("将日志数据插入到数据库失败: %s\n", err.Error())
 			ctx.JSON(200, res.Fail(4001, "将日志数据插入到数据库失败"))
@@ -106,7 +91,6 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 		//userName, ok := req["user_name"].(string)
 		ApiUrl, ok := req["api_url"].(string)
 		Invokeip, ok := req["invoke_ip"].(string)
-		Takingtime, ok := req["taking_time"].(string)
 		Invokelog, ok := req["invoke_log"].(string)
 		//json解析的数据是float64,需要二次转换
 		Status, ok := req["status"].(string)
@@ -119,7 +103,7 @@ func (*LogHandler) Logging(ctx *gin.Context) {
 			ctx.JSON(200, res.Fail(400, "断言失败"))
 			return
 		}
-		err := model.RecordUserInvokeLog(ApiUrl, User, Invokeip, Takingtime, Invokelog, Status)
+		err := model.RecordUserInvokeLog(ApiUrl, User, Invokeip, Invokelog, Status)
 		if err != nil {
 			fmt.Printf("将日志数据插入到数据库失败: %s\n", err.Error())
 			ctx.JSON(200, res.Fail(4001, "将日志数据插入到数据库失败"))
@@ -178,7 +162,7 @@ func (*LogHandler) DeleteUserLogs(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, res.Fail(400, "json数据错误！"))
 		return
 	}
-	User, ok := req["table_name"].(string)
+	UserId, ok := req["table_name"].(int)
 	Table, ok := req["table"].(string)
 	if ok {
 		fmt.Println("断言成功")
@@ -186,7 +170,7 @@ func (*LogHandler) DeleteUserLogs(ctx *gin.Context) {
 		fmt.Println("断言失败")
 		ctx.JSON(200, res.Fail(400, "断言失败"))
 	}
-	err := model.DeleteUserLogs(User, Table)
+	err := model.DeleteUserLogs(UserId, Table)
 	if err != nil {
 		fmt.Printf("删除日志失败: %s\n", err.Error())
 		ctx.JSON(200, res.Fail(4001, "删除日志失败"))
@@ -211,7 +195,7 @@ func (*LogHandler) GetUserLogs(ctx *gin.Context) {
 		return
 	}
 
-	User, ok := req["user_name"].(string)
+	UserId, ok := req["user_id"].(int)
 	Table, ok := req["table_name"].(string)
 	//Table := "sad"
 	if ok {
@@ -222,7 +206,7 @@ func (*LogHandler) GetUserLogs(ctx *gin.Context) {
 		ctx.JSON(200, res.Fail(400, "断言失败"))
 		return
 	}
-	logs, err := model.SearchUserLogs(User, Table) // 这里用你的用户名调用了之前的函数
+	logs, err := model.SearchUserLogs(UserId, Table) // 这里用你的用户名调用了之前的函数
 	if err != nil {
 		fmt.Println("获取不到日志，model异常", err)
 		ctx.JSON(200, res.Fail(400, "获取不到日志，请查看日志调用model是否异常"))

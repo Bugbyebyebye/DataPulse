@@ -2,19 +2,21 @@ package model
 
 import (
 	"commons/util"
+	"database/sql"
 	"fmt"
 	"task-service/dao"
+	"time"
 )
 
 // APIInfo API数据库结构体
 type APIInfo struct {
-	ID          int    `json:"api_id"`
-	Name        string `json:"api_name"`
-	URL         string `json:"api_url"`
-	Description string `json:"api_desc"`
-	State       int    `json:"state"`
-	CreateTime  int64  `json:"create_time"`
-	UpdateTime  int64  `json:"update_time"`
+	ID          int        `json:"api_id"`
+	Name        string     `json:"api_name"`
+	URL         string     `json:"api_url"`
+	Description string     `json:"api_desc"`
+	State       int        `json:"state"`
+	CreateTime  int64      `json:"create_time"`
+	UpdateTime  *time.Time `json:"update_time"`
 }
 
 // 将api插入到数据库中
@@ -61,20 +63,11 @@ func InsetAPIList(APIName, APIUrl, APIDesc string, UserID int) error {
 // 用id删除API/动态删除
 
 func DeleteAPI(UserID, APID int) error {
-	if APID == 0 {
-		// 如果 APID 为 0，删除所有具有特定 UserID 的记录
-		query := fmt.Sprintf("DELETE FROM t_api_user_relate WHERE user_id = %d", UserID)
-		_, err := dao.Db.Exec(query)
-		query = fmt.Sprintf("DELETE FROM t_api_info WHERE user_id = %d", UserID)
-		_, err = dao.Db.Exec(query)
-		return err
-	}
-
 	// 删除具有特定 UserID 和 APID 的记录
 	query := fmt.Sprintf("DELETE FROM t_api_user_relate WHERE user_id = %d AND api_id = %d", UserID, APID)
 	_, err := dao.Db.Exec(query)
 	// 删除具有特定 UserID 和 APID 的记录
-	query = fmt.Sprintf("DELETE FROM t_api_info WHERE user_id = %d AND api_id = %d", UserID, APID)
+	query = fmt.Sprintf("DELETE FROM t_api_info WHERE api_id = %d", APID)
 	_, err = dao.Db.Exec(query)
 	return err
 }
@@ -115,9 +108,19 @@ func SearchAPIList(UserID int) ([]APIInfo, error) {
 		// 处理查询结果并添加到 apiList
 		for rows.Next() {
 			var api APIInfo
-			if err := rows.Scan(&api.ID, &api.Name, &api.URL, &api.Description, &api.State, &api.CreateTime, &api.UpdateTime); err != nil {
+			var updateTime sql.NullTime // 使用sql.NullTime处理NULL时间字段
+
+			if err := rows.Scan(&api.ID, &api.Name, &api.URL, &api.Description, &api.State, &api.CreateTime, &updateTime); err != nil {
 				return nil, err
 			}
+
+			api.UpdateTime = nil // 默认置为空
+
+			if updateTime.Valid {
+				apiUpdateTime := updateTime.Time // 取得有效的时间值
+				api.UpdateTime = &apiUpdateTime  // 设置为有效时间值
+			}
+
 			apiList = append(apiList, api)
 		}
 		if err := rows.Err(); err != nil {
