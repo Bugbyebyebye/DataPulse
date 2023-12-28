@@ -26,7 +26,6 @@ func RandomString(length int) (string, error) {
 		}
 		bytes[i] = lettersAndDigits[n.Int64()]
 	}
-
 	return string(bytes), nil
 }
 
@@ -86,11 +85,18 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 }
 
 func (*TaskHandle) RestartDocker(ctx *gin.Context) {
-	name := ctx.Query("port")
+	var req map[string]interface{}
 	tunnel := make(chan string)
-
+	Status := 2
+	IDCache, ok := req["server_id"].(float64)
+	var ID int
+	if ok {
+		ID = int(IDCache)
+		fmt.Println("断言成功")
+	}
+	model.UpdateAPIStatus(Status, ID)
 	go func() {
-		err := api.RestartDocker(name)
+		err := api.RestartDocker("text")
 		if err != nil {
 			tunnel <- "服务重启出错，请检查日志"
 		}
@@ -101,13 +107,20 @@ func (*TaskHandle) RestartDocker(ctx *gin.Context) {
 		ctx.JSON(200, res.Fail(400, response))
 	case <-time.After(5 * time.Second): // 等待5秒
 		ctx.JSON(200, res.Success("服务重启成功"))
+		model.UpdateAPIStatus(1, ID)
 	}
 }
 
 func (*TaskHandle) StopDocker(ctx *gin.Context) {
 	name := ctx.Query("port")
+	var req map[string]interface{}
 	tunnel := make(chan string)
-
+	IDCache, ok := req["server_id"].(float64)
+	var ID int
+	if ok {
+		ID = int(IDCache)
+		fmt.Println("断言成功")
+	}
 	go func() {
 		err := api.StopDocker(name)
 		if err != nil {
@@ -119,6 +132,33 @@ func (*TaskHandle) StopDocker(ctx *gin.Context) {
 	select {
 	case response := <-tunnel:
 		ctx.JSON(200, res.Success(response))
+		model.UpdateAPIStatus(1, ID)
+	case <-time.After(5 * time.Second): // 等待5秒
+		ctx.JSON(200, res.Success("服务Loop.请尽快联系管理员"))
+	}
+}
+func (*TaskHandle) RemoveDocker(ctx *gin.Context) {
+	name := ctx.Query("port")
+	var req map[string]interface{}
+	tunnel := make(chan string)
+	IDCache, ok := req["server_id"].(float64)
+	var ID int
+	if ok {
+		ID = int(IDCache)
+		fmt.Println("断言成功")
+	}
+	go func() {
+		err := api.StopDocker(name)
+		if err != nil {
+			tunnel <- "服务删除出错，请检查日志"
+		}
+		tunnel <- "服务删除成功"
+		close(tunnel) // 发送完数据后关闭通道
+	}()
+	select {
+	case response := <-tunnel:
+		ctx.JSON(200, res.Success(response))
+		model.UpdateAPIStatus(0, ID)
 	case <-time.After(5 * time.Second): // 等待5秒
 		ctx.JSON(200, res.Success("服务Loop.请尽快联系管理员"))
 	}

@@ -17,4 +17,5 @@ func (*TaskRouter) Route(r *gin.Engine) {
 	//处理用户操作相关
 	r.GET("/getuserapilist", task.SearchAPIList)
 	r.POST("/deleteapilist", task.DeleteApi)
+	r.GET("/searchstate", task.SearchStatusLables)
 }

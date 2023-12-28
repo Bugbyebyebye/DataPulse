@@ -47,6 +47,23 @@ func (TaskHandle) DeleteApi(ctx *gin.Context) {
 	ctx.JSON(200, res.Success("删除成功"))
 }
 
+func (TaskHandle) SearchStatusLables(ctx *gin.Context) {
+	res := &result.Result{}
+	get := ctx.Request.Header.Get("id")
+	// 尝试将字符串转换为整数
+	UserID, err := strconv.Atoi(get)
+	if err != nil {
+		// 转换失败，处理错误
+		fmt.Println("转换失败:", err)
+	}
+	stateCounts, err := model.CountStates(UserID)
+	if err != nil {
+		fmt.Println("查询出错")
+		fmt.Println(err)
+	}
+	ctx.JSON(200, res.Success(stateCounts))
+}
+
 // SearchAPIList 实现拉取api列表的功能
 func (TaskHandle) SearchAPIList(ctx *gin.Context) {
 	res := &result.Result{}

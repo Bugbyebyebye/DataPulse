@@ -72,6 +72,69 @@ func DeleteAPI(UserID, APID int) error {
 	return err
 }
 
+// UpdateAPIStatus 更新状态
+func UpdateAPIStatus(Status, APID int) error {
+	query := fmt.Sprintf("UPDATE t_api_info SET state = %d, column2 = value2 WHERE api_id = %d", Status, APID)
+	_, err := dao.Db.Exec(query)
+	return err
+}
+
+// CountStates 查询状态
+func CountStates(UserID int) (map[int]int, error) {
+	// 查询 t_api_user_relate 获取所有的 api_id
+	query := fmt.Sprintf("SELECT api_id FROM t_api_user_relate WHERE user_id = %d", UserID)
+	rows, err := dao.Db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// 保存查询到的所有 api_id
+	var apiIDs []int
+	for rows.Next() {
+		var apiID int
+		if err := rows.Scan(&apiID); err != nil {
+			return nil, err
+		}
+		apiIDs = append(apiIDs, apiID)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	query = `
+    SELECT t_api_info.state, COUNT(t_api_info.state) AS count
+    FROM t_api_info
+    INNER JOIN t_api_user_relate ON t_api_info.api_id = t_api_user_relate.api_id
+    WHERE t_api_info.state IN (0, 1, 2, 3, 4) AND t_api_user_relate.user_id = ?
+    GROUP BY t_api_info.state
+    ORDER BY t_api_info.state
+`
+
+	rows, err = dao.Db.Query(query, UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	stateCounts := make(map[int]int)
+
+	for rows.Next() {
+		var state, count int
+		if err := rows.Scan(&state, &count); err != nil {
+			return nil, err
+		}
+		stateCounts[state] = count
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return stateCounts, nil
+
+}
+
 // SearchAPIList 通过用户id查询接口id列表
 func SearchAPIList(UserID int) ([]APIInfo, error) {
 	// 查询 t_api_user_relate 获取所有的 api_id
