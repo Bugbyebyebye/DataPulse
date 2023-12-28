@@ -42,7 +42,7 @@
 
 * gateway 网关 :8080
 * auth-service :8081
-    * grpc 鉴权服务 :9000
+    * gin 鉴权服务 :9000
 * log-service :8082
 * store-service :8083
 * store-service-grpc 数据读取存储服务

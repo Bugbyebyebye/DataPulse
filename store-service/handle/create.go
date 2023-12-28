@@ -11,6 +11,7 @@ import (
 	"store-service/config"
 	"store-service/dao"
 	"store-service/model"
+	"store-service/service"
 	"strconv"
 )
 
@@ -78,41 +79,8 @@ func (*StoreHandle) CreateTheTable(ctx *gin.Context) {
 	log.Printf("tableList => %+v", tableList)
 	//根据数据源选择底层数据来源
 	for i, t := range tableList {
-		var bottom []map[string]interface{}
-		if t.SourceName == "mysql" {
-			bottom = dao.GetDataByColumnList(t)
-			//log.Printf("bottom => %+v\n", bottom)
-		} else if t.SourceName == "mysql1" {
-			err := requests.URL(config.Conf.SEVERURL.MYSQLF).
-				Path("/getColumnData").
-				BodyJSON(&t).
-				ToJSON(&bottom).
-				Fetch(ctx)
-			//log.Printf("bottom => %+v\n", bottom)
-			if err != nil {
-				log.Printf("err => %s", err)
-			}
-		} else if t.SourceName == "mysql2" {
-			err := requests.URL(config.Conf.SEVERURL.MYSQLS).
-				Path("/getColumnData").
-				BodyJSON(&t).
-				ToJSON(&bottom).
-				Fetch(ctx)
-			//log.Printf("bottom => %+v", bottom)
-			if err != nil {
-				log.Printf("err => %s", err)
-			}
-		} else if t.SourceName == "mongodb1" {
-			err := requests.URL(config.Conf.SEVERURL.MongoDB).
-				Path("/getColumnData").
-				BodyJSON(&t).
-				ToJSON(&bottom).
-				Fetch(ctx)
-			//log.Printf("bottom => %+v", bottom)
-			if err != nil {
-				log.Printf("err => %s", err)
-			}
-		}
+		//获取底层数据
+		bottom := service.GetSourceData(ctx, t)
 
 		if i == 0 {
 			dao.InitTableData(db, targetTable, bottom)

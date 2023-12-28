@@ -4,6 +4,8 @@ import (
 	"commons/result"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
 	"strconv"
 	"task-service/model"
 )
@@ -56,36 +58,47 @@ func (TaskHandle) SearchStatusLables(ctx *gin.Context) {
 		ctx.JSON(200, res.Fail(400, "json数据错误！"))
 		return
 	}
-	UserIDCache, ok := req["user_id"].(float64)
-	var UserID int
-	if ok {
-		fmt.Println("断言成功，验证传入了ID")
-		UserID = int(UserIDCache)
-		stateCounts, err := model.CountStates(UserID)
-		if err != nil {
-			fmt.Println("查询出错")
-			fmt.Println(err)
-		}
-		ctx.JSON(200, stateCounts)
-		return
-	} else {
-		fmt.Println("断言失败，验证没有传入了ID")
-		fmt.Println(UserID)
-		get := ctx.Request.Header.Get("id")
-		// 尝试将字符串转换为整数
-		UserID, err := strconv.Atoi(get)
-		if err != nil {
-			// 转换失败，处理错误
-			fmt.Println("转换失败:", err)
-		}
-		stateCounts, err := model.CountStates(UserID)
-		if err != nil {
-			fmt.Println("查询出错")
-			fmt.Println(err)
-		}
-		ctx.JSON(200, res.Success(stateCounts))
-		return
+	//log.Printf("req => %+v", req)
+	id, _ := strconv.Atoi(req["user_id"].(string))
+	//log.Printf("id => %+v", id)
+
+	states, err := model.CountStates(id)
+	if err != nil {
+		log.Printf("err => %s", err)
 	}
+
+	ctx.JSON(http.StatusOK, states)
+
+	//UserIDCache, ok := req["user_id"].(float64)
+	//var UserID int
+	//if ok {
+	//	fmt.Println("断言成功，验证传入了ID")
+	//	UserID = int(UserIDCache)
+	//	stateCounts, err := model.CountStates(UserID)
+	//	if err != nil {
+	//		fmt.Println("查询出错")
+	//		fmt.Println(err)
+	//	}
+	//	ctx.JSON(200, stateCounts)
+	//	return
+	//} else {
+	//	fmt.Println("断言失败，验证没有传入了ID")
+	//	fmt.Println(UserID)
+	//	get := ctx.Request.Header.Get("id")
+	//	// 尝试将字符串转换为整数
+	//	UserID, err := strconv.Atoi(get)
+	//	if err != nil {
+	//		// 转换失败，处理错误
+	//		fmt.Println("转换失败:", err)
+	//	}
+	//	stateCounts, err := model.CountStates(UserID)
+	//	if err != nil {
+	//		fmt.Println("查询出错")
+	//		fmt.Println(err)
+	//	}
+	//	ctx.JSON(200, res.Success(stateCounts))
+	//	return
+	//}
 }
 
 // SearchAPIList 实现拉取api列表的功能

@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"github.com/carlmjohnson/requests"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -108,7 +109,7 @@ type IndexData struct {
 	PrivateTableNum int `json:"private_table_num"`
 	ApiTotalNum     int `json:"api_total_num"`
 	ApiWarningNum   int `json:"api_warning_num"`
-	TaskTotalNum    int `json:"task_total_num"`
+	ApiRunningNum   int `json:"api_running_num"`
 }
 
 // GetIndexTableData 获取首页需要的统计数据
@@ -136,12 +137,25 @@ func (*StoreHandle) GetIndexTableData(ctx *gin.Context) {
 		privateTableNum += int(num)
 	}
 
+	var result map[string]int
+	//获取api统计数据
+	err = requests.URL("http://task-service:8084").
+		Path("/searchstate").
+		BodyJSON(map[string]interface{}{
+			"user_id": idStr,
+		}).
+		ToJSON(&result).Fetch(ctx)
+	if err != nil {
+		log.Printf("err => %s", err)
+	}
+	log.Printf("result => %+v", result)
+
 	var data IndexData
 	data.DatabaseNum = 2
 	data.PublicTableNum = int(publicTableNum)
 	data.PrivateTableNum = privateTableNum
-	data.ApiTotalNum = 0
-	data.ApiWarningNum = 0
-	data.TaskTotalNum = 0
+	data.ApiTotalNum = result["1"]
+	data.ApiWarningNum = result["3"]
+	data.ApiRunningNum = result["2"]
 	ctx.JSON(http.StatusOK, res.Success(data))
 }
