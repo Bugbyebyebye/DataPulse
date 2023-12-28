@@ -66,7 +66,7 @@ func (TaskHandle) SearchStatusLables(ctx *gin.Context) {
 			fmt.Println("查询出错")
 			fmt.Println(err)
 		}
-		ctx.JSON(200, res.Success(stateCounts))
+		ctx.JSON(200, stateCounts)
 		return
 	} else {
 		fmt.Println("断言失败，验证没有传入了ID")
