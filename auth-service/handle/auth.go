@@ -4,6 +4,7 @@ import (
 	"auth-service/dao"
 	"auth-service/model"
 	"auth-service/util"
+	"commons/logsmodel"
 	"commons/result"
 	"context"
 	"errors"
@@ -51,6 +52,7 @@ func (*AuthHandler) UserLogin(ctx *gin.Context) {
 		if err != nil {
 			log.Printf("redis error => %s", err)
 			if errors.Is(err, redis.ErrNil) {
+
 				ctx.JSON(200, res.Fail(4001, "验证码已过期，请重新发送"))
 			}
 			return
@@ -76,7 +78,16 @@ func (*AuthHandler) UserLogin(ctx *gin.Context) {
 			data.Token = token
 			data.Role = user.Role
 			data.Authority = user.Authority
-
+			get := ctx.Request.Header.Get("id")
+			UserId, err := strconv.Atoi(get)
+			if err != nil {
+				// 转换失败，处理错误
+				fmt.Println("转换失败:", err)
+				return
+			}
+			Status := "End"
+			Context := "登陆成功"
+			logsmodel.PostActionLogs(UserId, Context, Status)
 			ctx.JSON(http.StatusOK, res.Success(data))
 			return
 		} else {

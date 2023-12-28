@@ -78,7 +78,7 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 		}
 		ctx.JSON(200, res.Success(namestr+".emotionalbug.top"))
 	}
-	//err = model.InsetAPIList(APIName, APIUrl, APIDesc, UserId)
+	//err = logsmodel.InsetAPIList(APIName, APIUrl, APIDesc, UserId)
 	//if err != nil {
 	//	fmt.Println("插入出错")
 	//}
