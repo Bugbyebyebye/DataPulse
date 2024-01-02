@@ -40,10 +40,10 @@ jobs:
           docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/task-service -f Dockerfile.task-service .
           docker push registry.cn-hangzhou.aliyuncs.com/dockercns/task-service
 #
-      - name: Build and push store-service
-        run: |
-          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/store-service -f Dockerfile.store-service .
-          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/store-service
+#      - name: Build and push store-service
+#        run: |
+#          docker build -t registry.cn-hangzhou.aliyuncs.com/dockercns/store-service -f Dockerfile.store-service .
+#          docker push registry.cn-hangzhou.aliyuncs.com/dockercns/store-service
 
 #      - name: Build and push mysql-second
 #        run: |

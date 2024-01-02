@@ -60,10 +60,10 @@ func (*StoreHandle) GetUserDatabaseNameList(ctx *gin.Context) {
 
 // GetUserTableData 获取用户创建数据库的数据
 func (*StoreHandle) GetUserTableData(ctx *gin.Context) {
-	//TODO 传入一个表名
+	//传入一个表名
 	databaseName := ctx.PostForm("database_name")
 	tableName := ctx.PostForm("table_name")
-	//TODO 根据数据表名返回全部数据
+	//根据数据表名返回全部数据
 	db := config.GetDbByDatabaseName(databaseName)
 	result, err := dao.QueryTableData(db, tableName)
 	if err != nil {
@@ -112,7 +112,7 @@ type IndexData struct {
 	ApiRunningNum   int `json:"api_running_num"`
 }
 
-// GetIndexTableData 获取首页需要的统计数据
+// GetIndexTableData 获取首页需要的6个统计数据
 func (*StoreHandle) GetIndexTableData(ctx *gin.Context) {
 	idStr := ctx.Request.Header.Get("id")
 	id, _ := strconv.Atoi(idStr)

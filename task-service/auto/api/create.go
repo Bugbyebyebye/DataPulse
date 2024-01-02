@@ -81,14 +81,14 @@ func CreateAPi(portStr string, pathStr string, funcName string) {
 }
 
 func RunDocker(namestr string) (error error) {
-	setEnv("MYSQL_HOST", "222.186.50.126:20010")
+	setEnv("MYSQL_HOST", "222.186.50.126:20134")
 	setEnv("USERNAME", "sora")
 	setEnv("MYSQL_NAME", "root")
 	setEnv("MYSQL_PASSWORD", "maojiukeai1412")
 	//setEnv("PORT", portStr)
 	// 构建 Docker 命令
 	cmd := exec.Command("docker", "run",
-		"--env", fmt.Sprintf("MYSQL_HOST=%s", "222.186.50.126:20010"),
+		"--env", fmt.Sprintf("MYSQL_HOST=%s", "222.186.50.126:20134"),
 		"--env", fmt.Sprintf("MYSQL_NAME=%s", "root"),
 		"--env", fmt.Sprintf("USERNAME=%s", "sora"),
 		"--env", fmt.Sprintf("MYSQL_PASSWORD=%s", "maojiukeai1412"),
