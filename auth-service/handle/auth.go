@@ -279,9 +279,11 @@ func (h *AuthHandler) SetAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, res.Fail(400, "json数据错误！"))
 		return
 	}
+
 	log.Printf("req %s", req)
+
 	//从redis获取验证码
-	codeStr, err := dao.Rc.Get(context.Background(), "DATAPULSE"+req.Email)
+	codeStr, err := dao.Rc.Get(context.Background(), "DATAPULSE"+user.Email)
 	if err != nil {
 		log.Printf("redis error => %s", err)
 	}
