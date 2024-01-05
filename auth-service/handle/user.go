@@ -2,6 +2,7 @@ package handle
 
 import (
 	"auth-service/model"
+	"commons/logsmodel"
 	"commons/result"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -64,10 +65,12 @@ func (*AuthHandler) SetUserRole(ctx *gin.Context) {
 	err := model.SetUserRole(userId, role)
 	if err != nil {
 		ctx.JSON(http.StatusOK, res.Fail(4001, "修改错误"))
+		logsmodel.PostActionLogs(userId, "修改用户角色", "Failed")
 		return
 	}
 
 	ctx.JSON(http.StatusOK, res.Success("角色设置成功"))
+	logsmodel.PostActionLogs(userId, "修改用户角色", "Success")
 }
 
 // SetUserAuthority 设置用户权限
@@ -79,10 +82,11 @@ func (*AuthHandler) SetUserAuthority(ctx *gin.Context) {
 
 	err := model.SetUserAuthority(id, auth)
 	if err != nil {
+		logsmodel.PostActionLogs(id, "修改用户权限", "Failed")
 		ctx.JSON(http.StatusOK, res.Fail(4001, "修改错误"))
 		return
 	}
-
+	logsmodel.PostActionLogs(id, "修改用户权限", "Failed")
 	ctx.JSON(http.StatusOK, res.Success("权限设置成功"))
 }
 
@@ -95,9 +99,11 @@ func (*AuthHandler) DeleteUser(ctx *gin.Context) {
 
 	err := model.DeleteUser(id, state)
 	if err != nil {
+		logsmodel.PostActionLogs(id, "删除用户", "Failed")
 		ctx.JSON(http.StatusOK, res.Fail(4001, "删除错误"))
 		return
 	}
+	logsmodel.PostActionLogs(id, "删除用户", "Success")
 
 	ctx.JSON(http.StatusOK, res.Success("删除成功"))
 }

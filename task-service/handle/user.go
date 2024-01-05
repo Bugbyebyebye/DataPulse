@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"commons/logsmodel"
 	"commons/result"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -41,9 +42,10 @@ func (TaskHandle) DeleteApi(ctx *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("删除失败")
-		ctx.JSON(200, res.Fail(400, "失败失败"))
+		ctx.JSON(200, res.Fail(400, "失败"))
 		return
 	}
+	logsmodel.PostActionLogs(UserId, "删除api", "Success")
 	ctx.JSON(200, res.Success("删除成功"))
 }
 
@@ -68,6 +70,6 @@ func (TaskHandle) SearchAPIList(ctx *gin.Context) {
 		ctx.JSON(200, res.Fail(400, "查询出错"))
 		return
 	}
-
+	logsmodel.PostActionLogs(UserID, "拉取API列表", "Success")
 	ctx.JSON(200, res.Success(apiList))
 }

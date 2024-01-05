@@ -36,7 +36,6 @@ type LoginRes struct {
 func (*AuthHandler) UserLogin(ctx *gin.Context) {
 	res := &result.Result{}
 	req := &LoginReq{}
-
 	err := ctx.BindJSON(req)
 	if err != nil {
 		log.Printf("json数据错误 err => %s", err)
@@ -78,16 +77,7 @@ func (*AuthHandler) UserLogin(ctx *gin.Context) {
 			data.Token = token
 			data.Role = user.Role
 			data.Authority = user.Authority
-			get := ctx.Request.Header.Get("id")
-			UserId, err := strconv.Atoi(get)
-			if err != nil {
-				// 转换失败，处理错误
-				fmt.Println("转换失败:", err)
-				return
-			}
-			Status := "End"
-			Context := "登陆成功"
-			logsmodel.PostActionLogs(UserId, Context, Status)
+			logsmodel.PostActionLogs(user.UserId, "用户登陆", "Success")
 			ctx.JSON(http.StatusOK, res.Success(data))
 			return
 		} else {
@@ -100,6 +90,7 @@ func (*AuthHandler) UserLogin(ctx *gin.Context) {
 		if err != nil {
 			log.Printf("getUserByUsername error => %s", err)
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				logsmodel.PostActionLogs(user.UserId, "用户登录，用户不存在", "Failed")
 				ctx.JSON(200, res.Fail(4001, "登录失败，用户不存在！"))
 				return
 			}
@@ -123,6 +114,7 @@ func (*AuthHandler) UserLogin(ctx *gin.Context) {
 		} else {
 			//校验密码错误
 			ctx.JSON(200, res.Fail(4001, "密码错误，登录失败！"))
+			logsmodel.PostActionLogs(user.UserId, "用户登陆", "Failed")
 		}
 	}
 }
@@ -259,9 +251,11 @@ func (*AuthHandler) SetUserInfo(ctx *gin.Context) {
 	if err != nil {
 		log.Printf("mysql error => %s", err)
 		ctx.JSON(200, res.Fail(4001, "更新失败！"))
+		logsmodel.PostActionLogs(id, "用户更新", "Failed")
 		return
 	}
 	user, err := model.GetUserInfoByUserId(id)
+	logsmodel.PostActionLogs(id, "用户更新", "Success")
 	ctx.JSON(http.StatusOK, res.Success(user))
 }
 
@@ -317,9 +311,11 @@ func (h *AuthHandler) SetAccount(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(200, res.Success("更新成功！"))
+		logsmodel.PostActionLogs(id, "用户更新", "Success")
 		return
 	} else {
 		ctx.JSON(200, res.Fail(4001, "验证码输入错误！"))
+		logsmodel.PostActionLogs(id, "用户更新,验证码输入错误", "Failed")
 		return
 	}
 }

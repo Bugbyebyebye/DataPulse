@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"commons/logsmodel"
 	"commons/result"
 	"crypto/rand"
 	"fmt"
@@ -76,6 +77,7 @@ func (*TaskHandle) RunDocker(ctx *gin.Context) {
 		if err != nil {
 			fmt.Println("插入出错")
 		}
+		logsmodel.PostActionLogs(UserId, "创建API:"+namestr+".emotionalbug.top", "Success")
 		ctx.JSON(200, res.Success(namestr+".emotionalbug.top"))
 	}
 	//err = logsmodel.InsetAPIList(APIName, APIUrl, APIDesc, UserId)
@@ -96,11 +98,21 @@ func (*TaskHandle) RestartDocker(ctx *gin.Context) {
 		}
 		close(tunnel) // 发送完数据后关闭通道
 	}()
+	get := ctx.Request.Header.Get("id")
+	// 尝试将字符串转换为整数
+	UserId, err := strconv.Atoi(get)
+	if err != nil {
+		// 转换失败，处理错误
+		fmt.Println("转换失败:", err)
+	}
 	select {
 	case response := <-tunnel:
 		ctx.JSON(200, res.Fail(400, response))
+		logsmodel.PostActionLogs(UserId, "服务重启", "Failed")
 	case <-time.After(5 * time.Second): // 等待5秒
 		ctx.JSON(200, res.Success("服务重启成功"))
+
+		logsmodel.PostActionLogs(UserId, "服务重启", "Success")
 	}
 }
 
@@ -116,10 +128,19 @@ func (*TaskHandle) StopDocker(ctx *gin.Context) {
 		tunnel <- "服务删除成功"
 		close(tunnel) // 发送完数据后关闭通道
 	}()
+	get := ctx.Request.Header.Get("id")
+	// 尝试将字符串转换为整数
+	UserId, err := strconv.Atoi(get)
+	if err != nil {
+		// 转换失败，处理错误
+		fmt.Println("转换失败:", err)
+	}
 	select {
 	case response := <-tunnel:
 		ctx.JSON(200, res.Success(response))
+		logsmodel.PostActionLogs(UserId, "删除API服务", "Success")
 	case <-time.After(5 * time.Second): // 等待5秒
 		ctx.JSON(200, res.Success("服务Loop.请尽快联系管理员"))
+		logsmodel.PostActionLogs(UserId, "删除API服务", "Failed")
 	}
 }

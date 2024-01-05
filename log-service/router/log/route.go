@@ -18,4 +18,5 @@ func (*LogRouter) Route(r *gin.Engine) {
 	r.POST("/getuserlogs", log.GetUserLogs)
 	//断点推送路由
 	r.POST("/recorduserlog", log.Logging)
+	r.GET("/posttest", log.PostLogs)
 }

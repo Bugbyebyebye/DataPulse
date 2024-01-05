@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"commons/logsmodel"
 	"commons/result"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,12 @@ func (*LogHandler) GetLogInfo(ctx *gin.Context) {
 	r := &result.Result{}
 
 	ctx.JSON(http.StatusOK, r.Success("查看日志成功！"))
+}
+
+func (*LogHandler) PostLogs(ctx *gin.Context) {
+	res := &result.Result{}
+	logsmodel.PostTaskLogs(10001, "测试文件1", "running")
+	ctx.JSON(200, res.Success("成功"))
 }
 
 /*
