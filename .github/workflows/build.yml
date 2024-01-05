@@ -3,7 +3,7 @@ name: Build and Push Docker Images
 on:
   push:
     branches:
-      - dev  # 可以根据你的需求更改触发条件
+      - main  # 可以根据你的需求更改触发条件
 
 jobs:
   build-and-push:
