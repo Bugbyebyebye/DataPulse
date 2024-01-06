@@ -43,7 +43,7 @@ func GetTableIdList(userId int) ([]int, error) {
 	log.Printf("userId => %v", userId)
 	var result []int
 	var tur TableUserRelate
-	err := config.System.Model(&tur).Where("user_id = ?", userId).Select("table_id").Find(&result).Error
+	err := config.System.Model(&tur).Where("user_id = ? and state = 1", userId).Select("table_id").Find(&result).Error
 	return result, err
 }
 
