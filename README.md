@@ -30,6 +30,7 @@
   * 用户设置任务
   * 用户设置接口
   * 实现数据清洗服务等
+  * API池实现服务[仓库](https://github.com/JDruki/DataPulse-DockerAPI)
 ### 技术栈
 * Gin 搭建web服务和网关
 * gRpc 服务间通信
